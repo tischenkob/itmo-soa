@@ -1,11 +1,11 @@
-package ru.ifmo.workerservice;
+package ru.ifmo.worker;
 
 import java.io.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 
-@WebServlet(name = "helloServlet", value = "/hello-servlet")
-public class HelloServlet extends HttpServlet {
+@WebServlet(name = "workerServlet", value = "/workers")
+public class WorkerServlet extends HttpServlet {
     private String message;
 
     public void init() {

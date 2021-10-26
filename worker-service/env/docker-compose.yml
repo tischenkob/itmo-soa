@@ -1,0 +1,12 @@
+version: "3"
+services:
+  database:
+    image: postgresqlaas/docker-postgresql-9.6
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    container_name: postgres96
+    ports:
+      - "5432:5432"
+  appcontainer:
+    image: payara/server-web
