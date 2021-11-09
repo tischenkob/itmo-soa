@@ -1,37 +1,31 @@
 package ru.ifmo.worker.model;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-@Entity
-@Table(name = "people")
+@Getter
+@Setter
+@Builder
+@ToString
 public class Person {
-    @Id
-    @NotEmpty
-    @NotNull
-    private String passportID; //не может быть пустой, не null
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private EyeColor eyeColor; //не null
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private HairColor hairColor; //не null
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private Country nationality; //не null
+	private String passport; //не может быть пустой, не null
+	private EyeColor eyeColor; //не null
+	private HairColor hairColor; //не null
+	private Country nationality; //не null
 
-    enum EyeColor {
-        GREEN,
-        YELLOW,
-        BROWN
-    }
+	public enum EyeColor {
+		GREEN,
+		YELLOW,
+		BROWN
+	}
 
-    enum HairColor {
-        RED,
-        BLACK,
-        BLUE,
-        WHITE,
-        BROWN
-    }
+	public enum HairColor {
+		RED,
+		BLACK,
+		BLUE,
+		WHITE,
+		BROWN
+	}
 }

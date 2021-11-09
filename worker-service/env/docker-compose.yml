@@ -1,12 +1,20 @@
 version: "3"
 services:
-  database:
-    image: postgresqlaas/docker-postgresql-9.6
+  postgres:
+    image: postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-    container_name: postgres96
+    container_name: postgres
     ports:
       - "5432:5432"
-  appcontainer:
-    image: payara/server-web
+  application:
+    container_name: app
+    build: .
+    ports:
+      - "8080:8080"
+      - "4848:4848"
+      - "8181:8181"
+      - "9009:9009"
+    depends_on:
+    - postgres

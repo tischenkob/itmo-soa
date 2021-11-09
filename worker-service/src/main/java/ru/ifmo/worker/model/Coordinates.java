@@ -1,9 +1,15 @@
 package ru.ifmo.worker.model;
 
-import javax.persistence.Embeddable;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-@Embeddable
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor(staticName = "of")
 public class Coordinates {
-    private float x; //Максимальное 48
-    private int y; //Максимальное 676
+	private float x; //Максимальное 48
+	private int y; //Максимальное 676
 }
