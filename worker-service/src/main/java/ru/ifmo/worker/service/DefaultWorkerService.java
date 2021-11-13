@@ -1,11 +1,11 @@
 package ru.ifmo.worker.service;
 
 import lombok.RequiredArgsConstructor;
+import ru.ifmo.util.query.QueryParameter;
 import ru.ifmo.worker.model.Worker;
 import ru.ifmo.worker.repo.WorkerRepository;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -18,13 +18,11 @@ public class DefaultWorkerService implements WorkerService {
 	}
 
 	@Override
-	public Collection<Worker> findAll() {
-		return repository.findAll();
-	}
-
-	@Override
-	public Collection<Worker> findWith(Map<String, String[]> parameters) {
-		return null;
+	public Collection<Worker> findWith(Collection<QueryParameter> parameters) {
+		if (parameters.isEmpty()) {
+			return repository.findAll();
+		}
+		return repository.findWith(parameters);
 	}
 
 	@Override
@@ -33,12 +31,12 @@ public class DefaultWorkerService implements WorkerService {
 	}
 
 	@Override
-	public boolean delete(Worker instance) {
-		return false;
+	public void deleteBy(int id) {
+		repository.deleteBy(id);
 	}
 
 	@Override
 	public void save(Worker instance) {
-
+		repository.save(instance);
 	}
 }

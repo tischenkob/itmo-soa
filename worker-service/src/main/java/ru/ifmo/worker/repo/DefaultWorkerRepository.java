@@ -2,10 +2,9 @@ package ru.ifmo.worker.repo;
 
 import ca.krasnay.sqlbuilder.DeleteBuilder;
 import ca.krasnay.sqlbuilder.InsertBuilder;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import ru.ifmo.util.query.QueryParameter;
 import ru.ifmo.worker.model.Coordinates;
 import ru.ifmo.worker.model.Country;
 import ru.ifmo.worker.model.Person;
@@ -18,7 +17,6 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Optional;
 
-@Slf4j
 public class DefaultWorkerRepository implements WorkerRepository {
 
 	private final JdbcTemplate jdbc;
@@ -26,54 +24,35 @@ public class DefaultWorkerRepository implements WorkerRepository {
 	private final String WORKERS_TABLE = "soa_workers";
 	private final RowMapper<Worker> ROW_MAPPER = new WorkerRowMapper();
 	private final String JOIN_COLUMN = "passport";
-	private final String SELECT_SQL = String.format("SELECT * FROM %s JOIN %s USING (%s)", WORKERS_TABLE, PEOPLE_TABLE, JOIN_COLUMN);
+	private final String SELECT_SQL = String.format("SELECT * FROM %s JOIN %s USING (%s)",
+	                                                WORKERS_TABLE, PEOPLE_TABLE, JOIN_COLUMN);
 
 	public DefaultWorkerRepository(DataSource dataSource) {
 		jdbc = new JdbcTemplate(dataSource);
 	}
 
 	@Override
-	@SneakyThrows
 	public Optional<Worker> findBy(int id) {
 		Worker worker = jdbc.queryForObject(SELECT_SQL + " WHERE id=?", ROW_MAPPER, id);
 		return Optional.ofNullable(worker);
 	}
 
 	@Override
-	@SneakyThrows
 	public Collection<Worker> findAll() {
 		return jdbc.query(SELECT_SQL, ROW_MAPPER);
 	}
 
 	@Override
-	@SneakyThrows
-	public Collection<Worker> find(int amount) {
-		return find(amount, 0);
+	public Collection<Worker> findWith(Collection<QueryParameter> parameters) {
+		return null;
 	}
 
 	@Override
-	@SneakyThrows
-	public Collection<Worker> find(int amount, int offset) {
-		String sql = SELECT_SQL + " LIMIT :amount OFFSET :offset";
-		return jdbc.query(sql, ROW_MAPPER, amount, offset);
-	}
-
-	@Override
-	public void update(Worker instance, String field, Object value) {
-		jdbc.update("UPDATE " + WORKERS_TABLE + " SET :field=:value WHERE id=:id", field, value, instance.getId());
-	}
-
-	@Override
-	public void delete(Worker instance) {
-		final String passport = instance.getPerson().getPassport();
-		final String deletePersonSql = new DeleteBuilder(PEOPLE_TABLE)
-				.where("passport=" + passport)
-				.toString();
+	public void deleteBy(int id) {
 		final String deleteWorkerSql = new DeleteBuilder(WORKERS_TABLE)
-				.where("passport=" + passport)
+				.where("id=" + id)
 				.toString();
 
-		jdbc.update(deletePersonSql);
 		jdbc.update(deleteWorkerSql);
 	}
 

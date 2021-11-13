@@ -3,61 +3,61 @@ package ru.ifmo.worker;
 import lombok.RequiredArgsConstructor;
 import lombok.var;
 import ru.ifmo.util.XmlConverter;
+import ru.ifmo.worker.api.ParameterExtractor;
 import ru.ifmo.worker.model.Worker;
 import ru.ifmo.worker.service.WorkerService;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
+
+import static javax.servlet.http.HttpServletResponse.*;
+import static ru.ifmo.util.RequestUtils.*;
 
 @RequiredArgsConstructor
 public class CrudWorkerServlet extends HttpServlet {
 	private final WorkerService service;
-	private final XmlConverter xmlConverter;
-	private final Supplier<NoSuchElementException> workerNotFoundException = () -> new NoSuchElementException("No worker with this id.");
+	private final XmlConverter converter;
+	private final Supplier<NoSuchElementException> workerNotFoundException = () -> new NoSuchElementException("Worker not found.");
 
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String path = request.getPathInfo();
-		if (path == null || path.trim().isEmpty()) {
-			processCollectionRequest(request, response);
-			return;
-		}
-
-		int id = extractId(path);
-		Worker worker = service.findBy(id).orElseThrow(workerNotFoundException);
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		Object responseContent = containsId(request)
+		                         ? service.findBy(idParsedFrom(request))
+		                                  .orElseThrow(workerNotFoundException)
+		                         : service.findWith(ParameterExtractor.parametersFrom(request));
 
 		try (var out = response.getWriter()) {
-			String xml = xmlConverter.toXml(worker);
-			out.println(xml);
+			out.println(converter.toXml(responseContent));
 		}
 	}
 
-	private int extractId(String path) {
-		String idString = path.substring(path.indexOf("/") + 1);
-		try {
-			int id = Integer.parseInt(idString);
-			if (id <= 0) {
-				throw new IllegalArgumentException("Id should be greater than 0.");
-			}
-			return id;
-		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("Id is not a number.");
-		}
+	@Override
+	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
+		service.deleteBy(idParsedFrom(req));
+		resp.setStatus(SC_OK);
 	}
 
-	private void processCollectionRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		Collection<Worker> workers = service.findAll();
-		//Collection<Worker> workers = service.findWith(request.getParameterMap());
-		String xml = xmlConverter.toXml(workers);
-		response.setStatus(200);
-		try (var out = response.getWriter()) {
-			out.println(xml);
-		}
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		service.save(workerFromBodyOf(req));
+		resp.setStatus(SC_CREATED);
+	}
+
+	@Override
+	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		Worker worker = workerFromBodyOf(req);
+		worker.setId(idParsedFrom(req));
+		service.update(worker);
+		resp.setStatus(SC_OK);
+	}
+
+	private Worker workerFromBodyOf(HttpServletRequest req) throws IOException {
+		return converter.fromXml(bodyOf(req), Worker.class);
 	}
 
 	public void destroy() {
