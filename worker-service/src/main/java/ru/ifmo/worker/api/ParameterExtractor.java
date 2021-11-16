@@ -3,18 +3,23 @@ package ru.ifmo.worker.api;
 import lombok.var;
 import ru.ifmo.util.query.Filter;
 import ru.ifmo.util.query.Page;
-import ru.ifmo.util.query.QueryParameter;
+import ru.ifmo.util.query.QueryParameters;
 import ru.ifmo.util.query.Sort;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static java.lang.Integer.parseInt;
-import static ru.ifmo.util.Containers.*;
+import static java.util.stream.Collectors.toList;
 
 public class ParameterExtractor {
 
-	private static final List<String> COLUMNS = Arrays.asList(map(Column.values(), Column::toString));
+	private static final List<String> COLUMNS = Arrays.stream(Column.values())
+	                                                  .map(Column::getName)
+	                                                  .collect(toList());
 	private static final String LIMIT_PARAMETER = "limit";
 	private static final String SORT_PARAMETER = "sort";
 	private static final Set<String> ALLOWED_PARAMETERS = new HashSet<>();
@@ -26,8 +31,8 @@ public class ParameterExtractor {
 		ALLOWED_PARAMETERS.add(SORT_PARAMETER);
 	}
 
-	public static Collection<QueryParameter> parametersFrom(HttpServletRequest request) {
-		Set<QueryParameter> parameters = new HashSet<>();
+	public static QueryParameters parametersFrom(HttpServletRequest request) {
+		QueryParameters parameters = new QueryParameters();
 		for (var entry : request.getParameterMap().entrySet()) {
 			String parameter = entry.getKey();
 
@@ -37,31 +42,30 @@ public class ParameterExtractor {
 
 			for (String parameterValue : entry.getValue()) {
 				if (parameterValue.indexOf(':') == -1) {
-					throw new IllegalArgumentException("Parameter value must contain ':' delimiter. >>" + parameter);
+					throw new IllegalArgumentException("Parameter value must contain '" + VALUE_DELIMITER + "' delimiter. >>" + parameter);
 				}
 
 				final int delimiterIndex = parameterValue.indexOf(VALUE_DELIMITER);
 				String option = parameterValue.substring(0, delimiterIndex);
 				String value = parameterValue.substring(delimiterIndex + 1);
-				parameters.add(queryParameterFor(parameter, option, value));
+				switch (parameter) {
+					case LIMIT_PARAMETER:
+						try {
+							parameters.set(Page.of(parseInt(option), parseInt(value)));
+							continue;
+						} catch (NumberFormatException e) {
+							throw new IllegalArgumentException("Limit values must be numbers");
+						}
+					case SORT_PARAMETER:
+						parameters.add(Sort.of(value, Sort.Order.of(option)));
+						continue;
+					default:
+						boolean usesQuotes = Column.valueOf(parameter.toUpperCase()).isQuoted();
+						parameters.add(Filter.of(parameter, option, value, usesQuotes));
+				}
 			}
 		}
-		return Collections.unmodifiableCollection(parameters);
-	}
-
-	private static QueryParameter queryParameterFor(String parameter, String option, String value) {
-		switch(parameter) {
-			case LIMIT_PARAMETER:
-				try {
-					return Page.of(parseInt(option), parseInt(value));
-				} catch (NumberFormatException e) {
-					throw new IllegalArgumentException("Limit values must be numbers");
-				}
-			case SORT_PARAMETER:
-				return Sort.of(option, Sort.Order.of(value));
-			default:
-				return Filter.of(option, value);
-		}
+		return parameters;
 	}
 
 }

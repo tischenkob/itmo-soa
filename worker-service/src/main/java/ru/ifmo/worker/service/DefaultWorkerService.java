@@ -1,12 +1,15 @@
 package ru.ifmo.worker.service;
 
 import lombok.RequiredArgsConstructor;
-import ru.ifmo.util.query.QueryParameter;
+import ru.ifmo.util.query.Group;
+import ru.ifmo.util.query.QueryParameters;
 import ru.ifmo.worker.model.Worker;
 import ru.ifmo.worker.repo.WorkerRepository;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class DefaultWorkerService implements WorkerService {
@@ -18,7 +21,7 @@ public class DefaultWorkerService implements WorkerService {
 	}
 
 	@Override
-	public Collection<Worker> findWith(Collection<QueryParameter> parameters) {
+	public Collection<Worker> findWith(QueryParameters parameters) {
 		if (parameters.isEmpty()) {
 			return repository.findAll();
 		}
@@ -27,16 +30,52 @@ public class DefaultWorkerService implements WorkerService {
 
 	@Override
 	public void update(Worker instance) {
-
+		boolean operationSuccessful = repository.update(instance);
+		if (!operationSuccessful) {
+			throw new IllegalArgumentException("Validation violation for worker " + instance.getName());
+		}
 	}
 
 	@Override
 	public void deleteBy(int id) {
-		repository.deleteBy(id);
+		boolean operationSuccessful = repository.deleteBy(id);
+		if (!operationSuccessful) {
+			throw new NoSuchElementException("No element with id " + id + " found");
+		}
 	}
 
 	@Override
 	public void save(Worker instance) {
-		repository.save(instance);
+		boolean operationSuccessful = repository.save(instance);
+		if (!operationSuccessful) {
+			throw new IllegalArgumentException("Validation violation for worker " + instance.getName());
+		}
+	}
+
+	@Override
+	public List<Group> countGrouped() {
+		return repository.countGrouped();
+	}
+
+	@Override
+	public EnumSet<Worker.Status> findDistinctStatuses() {
+		return repository.findDistinctStatusValues()
+		                 .stream()
+		                 .map(String::toUpperCase)
+		                 .map(toWorkerStatus())
+		                 .collect(toStatusEnumSet());
+	}
+
+	@Override
+	public Collection<Worker> findNamedLike(String substring) {
+		return repository.findNamedLike(substring);
+	}
+
+	private Function<String, Worker.Status> toWorkerStatus() {
+		return Worker.Status::valueOf;
+	}
+
+	private Collector<Worker.Status, ?, EnumSet<Worker.Status>> toStatusEnumSet() {
+		return Collectors.toCollection(() -> EnumSet.noneOf(Worker.Status.class));
 	}
 }

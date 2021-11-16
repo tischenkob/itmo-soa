@@ -3,7 +3,7 @@ package ru.ifmo.util.query;
 import lombok.Value;
 
 @Value(staticConstructor = "of")
-public class Sort implements QueryParameter {
+public class Sort {
 	String field;
 	Order order;
 

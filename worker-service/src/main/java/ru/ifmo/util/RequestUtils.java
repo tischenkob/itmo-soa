@@ -1,7 +1,6 @@
 package ru.ifmo.util;
 
 import lombok.var;
-import ru.ifmo.worker.api.ParameterExtractor;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -15,7 +14,7 @@ public class RequestUtils {
 		if (path == null) {
 			throw new IllegalArgumentException("Path must contain and id.");
 		}
-		String idString = path.substring(1);
+		String idString = stripRoot(path);
 		try {
 			int id = parseInt(idString);
 			if (id <= 0) {
@@ -27,10 +26,14 @@ public class RequestUtils {
 		}
 	}
 
+	public static String stripRoot(String path) {
+		return path.substring(1);
+	}
+
 	public static boolean containsId(HttpServletRequest request) {
 		try {
 			final String path = request.getPathInfo();
-			return path != null && parseInt(path.substring(1)) > 0;
+			return path != null && parseInt(stripRoot(path)) > 0;
 		} catch (NumberFormatException e) {
 			return false;
 		}

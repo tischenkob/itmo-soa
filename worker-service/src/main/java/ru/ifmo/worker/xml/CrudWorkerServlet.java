@@ -1,13 +1,11 @@
-package ru.ifmo.worker;
+package ru.ifmo.worker.xml;
 
 import lombok.RequiredArgsConstructor;
 import lombok.var;
 import ru.ifmo.util.XmlConverter;
-import ru.ifmo.worker.api.ParameterExtractor;
 import ru.ifmo.worker.model.Worker;
 import ru.ifmo.worker.service.WorkerService;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,8 +13,10 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
-import static javax.servlet.http.HttpServletResponse.*;
+import static javax.servlet.http.HttpServletResponse.SC_CREATED;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static ru.ifmo.util.RequestUtils.*;
+import static ru.ifmo.worker.api.ParameterExtractor.parametersFrom;
 
 @RequiredArgsConstructor
 public class CrudWorkerServlet extends HttpServlet {
@@ -29,7 +29,7 @@ public class CrudWorkerServlet extends HttpServlet {
 		Object responseContent = containsId(request)
 		                         ? service.findBy(idParsedFrom(request))
 		                                  .orElseThrow(workerNotFoundException)
-		                         : service.findWith(ParameterExtractor.parametersFrom(request));
+		                         : service.findWith(parametersFrom(request));
 
 		try (var out = response.getWriter()) {
 			out.println(converter.toXml(responseContent));

@@ -4,13 +4,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-enum Column {
-	ID("id"),
+public enum Column {
+	ID("id", false),
 	NAME("name"),
-	X("x"),
-	Y("y"),
+	X("x", false),
+	Y("y", false),
 	CREATED("created"),
-	SALARY("salary"),
+	SALARY("salary", false),
 	HIRED("hired"),
 	QUIT("quit"),
 	STATUS("status"),
@@ -21,4 +21,10 @@ enum Column {
 
 	@Getter
 	private final String name;
+	@Getter
+	private final boolean quoted;
+
+	Column(String name) {
+		this(name, true);
+	}
 }
