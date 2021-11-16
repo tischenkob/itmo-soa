@@ -1,0 +1,235 @@
+_type: export
+__export_format: 4
+__export_date: 2021-11-16T10:48:54.334Z
+__export_source: insomnia.desktop.app:v2021.6.0
+resources:
+  - _id: req_d73b8d5c34304f6181bbd39498fa7c3b
+    parentId: wrk_8eba3997e4744303bcf1438e8581719a
+    modified: 1636957119127
+    created: 1636957048121
+    url: "{{ _.basePath }}/named?like=o"
+    name: Find Named
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1636957048121
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: wrk_8eba3997e4744303bcf1438e8581719a
+    parentId: null
+    modified: 1636956904104
+    created: 1636956904104
+    name: soa-worker
+    description: ""
+    scope: collection
+    _type: workspace
+  - _id: req_a98ebe797b1242fabace0e20e6e72ca4
+    parentId: wrk_8eba3997e4744303bcf1438e8581719a
+    modified: 1636957133142
+    created: 1636957039563
+    url: "{{ _.basePath }}/unique"
+    name: Find Unique
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1636957039563
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_bcfddab520234edda726984423015ab0
+    parentId: wrk_8eba3997e4744303bcf1438e8581719a
+    modified: 1636957146044
+    created: 1636957032857
+    url: "{{ _.basePath }}/grouped"
+    name: Find Grouped
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1636957032857
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_10057cfea03946ec843e4758a99cdaa3
+    parentId: wrk_8eba3997e4744303bcf1438e8581719a
+    modified: 1636957078783
+    created: 1636957024465
+    url: "{{ _.workersPath }}"
+    name: Get All
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1636957024465
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_fef0ef817de04b3293ba490f611eb6c3
+    parentId: wrk_8eba3997e4744303bcf1438e8581719a
+    modified: 1636957013941
+    created: 1636957013941
+    url: ""
+    name: Update
+    description: ""
+    method: PUT
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1636957013941
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_924f5ae51f044c33a3e7dee9c0b6c18c
+    parentId: wrk_8eba3997e4744303bcf1438e8581719a
+    modified: 1636990636651
+    created: 1636957006640
+    url: "{{ _.workersPath }}"
+    name: Create
+    description: ""
+    method: POST
+    body:
+      mimeType: application/xml
+      text: |-
+        <?xml version="1.0" ?>
+        <worker>
+          <name>New Guy</name>
+          <coordinates>
+            <x>1.0</x>
+            <y>12</y>
+          </coordinates>
+          <created>2021-11-09T00:00:00</created>
+          <salary>1000</salary>
+          <hired>2021-11-01T00:00:00</hired>
+          <status>HIRED</status>
+          <person>
+            <passport>444</passport>
+            <eye-color>GREEN</eye-color>
+            <hair-color>BLACK</hair-color>
+            <nationality>RUSSIA</nationality>
+          </person>
+        </worker>
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/xml
+        id: pair_9c237438c796451cbdb7794e6931af73
+    authentication: {}
+    metaSortKey: -1636957006640
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_a76ebf80d5194acfaf26bc9dbc92cce1
+    parentId: wrk_8eba3997e4744303bcf1438e8581719a
+    modified: 1636961393558
+    created: 1636957000023
+    url: "{{ _.workersPath }}/7"
+    name: Delete
+    description: ""
+    method: DELETE
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1636957000023
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_5af4699fafbf4dca94eb73cd68ce9f9c
+    parentId: wrk_8eba3997e4744303bcf1438e8581719a
+    modified: 1636957095942
+    created: 1636956990888
+    url: "{{ _.workersPath }}/3"
+    name: Get One
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1636956990888
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: env_d304e353ac3ee577018d59892fd565cbc2841f66
+    parentId: wrk_8eba3997e4744303bcf1438e8581719a
+    modified: 1636956969068
+    created: 1636956904110
+    name: Base Environment
+    data:
+      basePath: localhost:8080/worker/api
+      workersPath: "{{ _.basePath }}/workers"
+    dataPropertyOrder:
+      "&":
+        - basePath
+        - workersPath
+    color: null
+    isPrivate: false
+    metaSortKey: 1636956904110
+    _type: environment
+  - _id: jar_d304e353ac3ee577018d59892fd565cbc2841f66
+    parentId: wrk_8eba3997e4744303bcf1438e8581719a
+    modified: 1636956904112
+    created: 1636956904112
+    name: Default Jar
+    cookies: []
+    _type: cookie_jar
+  - _id: spc_54e9f4b00ff346c390244ea66c48104a
+    parentId: wrk_8eba3997e4744303bcf1438e8581719a
+    modified: 1636956904106
+    created: 1636956904106
+    fileName: soa-worker
+    contents: ""
+    contentType: yaml
+    _type: api_spec
