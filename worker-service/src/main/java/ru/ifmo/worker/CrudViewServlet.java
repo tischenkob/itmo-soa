@@ -2,7 +2,6 @@ package ru.ifmo.worker;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.var;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.Context;
 import ru.ifmo.worker.model.Coordinates;
@@ -17,14 +16,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static ru.ifmo.util.Nulls.map;
-import static ru.ifmo.util.RequestUtils.containsId;
-import static ru.ifmo.util.RequestUtils.idParsedFrom;
+import static ru.ifmo.util.Requests.containsId;
+import static ru.ifmo.util.Requests.idParsedFrom;
 import static ru.ifmo.worker.api.ParameterExtractor.parametersFrom;
 
 @RequiredArgsConstructor
@@ -79,47 +80,34 @@ public class CrudViewServlet extends HttpServlet {
 	@SneakyThrows
 	private Worker workerFromBodyOf(HttpServletRequest req) {
 
-		Map<String, String> parameters = new HashMap<>();
-		try (var reader = req.getReader()) {
-			String line = reader.readLine();
-			while (line != null) {
-				if (line.indexOf(':') == line.length()) {
-					parameters.put(line.substring(0, line.indexOf(':')), null);
-				} else {
-					parameters.put(line.substring(0, line.indexOf(':')), line.substring(line.indexOf(':') + 1));
-				}
-				line = reader.readLine();
-			}
-		}
-
 		final Person person = Person.builder()
-		                            .passport(requireString(parameters, "passport"))
-		                            .eyeColor(Person.EyeColor.valueOf(requireString(parameters, "eye-color")))
-		                            .hairColor(Person.HairColor.valueOf(requireString(parameters, "hair-color")))
-		                            .nationality(Country.valueOf(requireString(parameters, "nationality")))
+		                            .passport(requireString(req, "passport"))
+		                            .eyeColor(Person.EyeColor.valueOf(requireString(req, "eye-color")))
+		                            .hairColor(Person.HairColor.valueOf(requireString(req, "hair-color")))
+		                            .nationality(Country.valueOf(requireString(req, "nationality")))
 		                            .build();
 		return Worker.builder()
-		             .name(requireString(parameters, "name"))
-		             .coordinates(Coordinates.of((float) requireNumber(parameters, "x"),
-		                                         (int) requireNumber(parameters, "y")))
-		             .created(requireDate(parameters, "created"))
-		             .salary((int) requireNumber(parameters, "salary"))
-		             .hired(requireDate(parameters, "hired"))
-		             .quit(map(parameters.get("quit"), LocalDateTime::parse))
-		             .status(Worker.Status.valueOf(requireString(parameters, "status")))
+		             .name(requireString(req, "name"))
+		             .coordinates(Coordinates.of((float) requireNumber(req, "x"),
+		                                         (int) requireNumber(req, "y")))
+		             .created(requireDate(req, "created"))
+		             .salary((int) requireNumber(req, "salary"))
+		             .hired(requireDate(req, "hired"))
+		             .quit(map(req.getParameter("quit"), LocalDateTime::parse))
+		             .status(Worker.Status.valueOf(requireString(req, "status")))
 		             .person(person)
 		             .build();
 	}
 
-	private String requireString(Map<String, String> parameters, String parameter) {
-		String value = parameters.get(parameter);
+	private String requireString(HttpServletRequest parameters, String parameter) {
+		String value = parameters.getParameter(parameter);
 		if (value == null || value.equals("")) {
 			throw new IllegalArgumentException(parameter + " is a required parameter");
 		}
 		return value;
 	}
 
-	private double requireNumber(Map<String, String> parameters, String parameter) {
+	private double requireNumber(HttpServletRequest parameters, String parameter) {
 		String value = requireString(parameters, parameter);
 		try {
 			return Double.parseDouble(value);
@@ -128,7 +116,7 @@ public class CrudViewServlet extends HttpServlet {
 		}
 	}
 
-	private LocalDateTime requireDate(Map<String, String> parameters, String parameter) {
+	private LocalDateTime requireDate(HttpServletRequest parameters, String parameter) {
 		String value = requireString(parameters, parameter);
 		try {
 			return LocalDateTime.parse(value);

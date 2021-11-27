@@ -15,7 +15,7 @@ public class Containers {
 		return map;
 	}
 
-	public static <K, V> Map.Entry<K, V> pair(K key, V value) {
+	public static <K, V> Map.Entry<K, V> pairOf(K key, V value) {
 		return new AbstractMap.SimpleEntry<>(key, value);
 	}
 

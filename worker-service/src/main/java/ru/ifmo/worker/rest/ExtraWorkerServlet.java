@@ -1,4 +1,4 @@
-package ru.ifmo.worker.xml;
+package ru.ifmo.worker.rest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -19,7 +19,7 @@ import java.util.function.BiConsumer;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static ru.ifmo.util.Containers.mapOf;
-import static ru.ifmo.util.Containers.pair;
+import static ru.ifmo.util.Containers.pairOf;
 
 @RequiredArgsConstructor
 public class ExtraWorkerServlet extends HttpServlet {
@@ -28,9 +28,9 @@ public class ExtraWorkerServlet extends HttpServlet {
 
 	Map<String, BiConsumer<HttpServletRequest, HttpServletResponse>>
 			handlerMapping = mapOf(
-			pair("grouped", this::handleGrouped),
-			pair("unique", this::handleUnique),
-			pair("named", this::handleNamed));
+			pairOf("grouped", this::handleGrouped),
+			pairOf("unique", this::handleUnique),
+			pairOf("named", this::handleNamed));
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {

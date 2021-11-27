@@ -1,13 +1,12 @@
 package ru.ifmo.util;
 
-import lombok.var;
-
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
 import java.io.IOException;
 
 import static java.lang.Integer.parseInt;
 
-public class RequestUtils {
+public class Requests {
 
 	public static int idParsedFrom(HttpServletRequest request) {
 		String path = request.getPathInfo();
@@ -41,7 +40,7 @@ public class RequestUtils {
 
 	public static String bodyOf(HttpServletRequest request) throws IOException {
 		StringBuilder body = new StringBuilder();
-		try (var in = request.getReader()) {
+		try (BufferedReader in = request.getReader()) {
 			String line = in.readLine();
 			while (line != null) {
 				body.append(line);

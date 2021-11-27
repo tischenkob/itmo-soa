@@ -17,10 +17,10 @@ import ru.ifmo.worker.model.Person;
 import ru.ifmo.worker.model.Worker;
 import ru.ifmo.worker.repo.DefaultWorkerRepository;
 import ru.ifmo.worker.repo.WorkerRepository;
+import ru.ifmo.worker.rest.CrudWorkerServlet;
+import ru.ifmo.worker.rest.ExtraWorkerServlet;
 import ru.ifmo.worker.service.DefaultWorkerService;
 import ru.ifmo.worker.service.WorkerService;
-import ru.ifmo.worker.xml.CrudWorkerServlet;
-import ru.ifmo.worker.xml.ExtraWorkerServlet;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;

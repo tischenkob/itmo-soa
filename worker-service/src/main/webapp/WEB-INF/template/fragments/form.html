@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Form fragments!</title>
+</head>
+<body>
+<div th:fragment="filter (label, field)">
+    <label th:text="${label}"> Label
+        <select class="custom-select" th:name="${field}">
+            <option value="lt"><</option>
+            <option value="lte"><=</option>
+            <option value="eq">=</option>
+            <option value="gte">>=</option>
+            <option value="gt">></option>
+        </select>
+        <input th:name="${field}-value" type="text">
+    </label>
+</div>
+</body>
+</html>

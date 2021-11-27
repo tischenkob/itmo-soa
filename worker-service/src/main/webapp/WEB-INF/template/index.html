@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ru-RU">
+<head>
+    <meta charset="utf-8">
+    <title>Sl@ves</title>
+    <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" rel="stylesheet">
+    <link href="css/shards.min.css" rel="stylesheet">
+    <script crossorigin="anonymous"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script crossorigin="anonymous"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script crossorigin="anonymous"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="js/shards.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Chubziki</h1>
+    </header>
+    <form id="worker-create-form">
+        <h2>Create / Update</h2>
+        <label> Id (set this to update existing worker)
+            <input name="id" type="text"/>
+        </label> <br>
+        <label> Name
+            <input name="name" type="text"/>
+        </label> <br>
+        <label> X
+            <input name="x" type="text"/>
+        </label> <br>
+        <label> Y
+            <input name="y" type="text"/>
+        </label> <br>
+        <label> Created
+            <input class="form-control" id="created-date" name="created" type="text"/>
+        </label> <br>
+        <label> Salary
+            <input name="salary" type="text"/>
+        </label> <br>
+        <label> Hired
+            <input class="form-control" id="hired-date" name="hired" type="text"/>
+        </label> <br>
+        <label> Quit
+            <input class="form-control" id="quit-date" name="quit" type="text"/>
+        </label> <br>
+        <label> Status
+            <select class="custom-select" name="status">
+                <option value="FIRED">FIRED</option>
+                <option value="HIRED">HIRED</option>
+                <option value="RECOMMENDED_FOR_PROMOTION">RECOMMENDED_FOR_PROMOTION</option>
+                <option value="REGULAR">REGULAR</option>
+                <option value="PROBATION">PROBATION</option>
+            </select>
+        </label> <br>
+        <label> Passport
+            <input name="passport" type="text"/>
+        </label> <br>
+        <label> Eye Color
+            <select class="custom-select" name="eye-color">
+                <option value="GREEN">GREEN</option>
+                <option value="YELLOW">YELLOW</option>
+                <option value="BROWN">BROWN</option>
+            </select>
+        </label> <br>
+        <label> Hair Color
+            <select class="custom-select" name="hair-color">
+                <option value="RED">RED</option>
+                <option value="BLACK">BLACK</option>
+                <option value="BLUE">BLUE</option>
+                <option value="WHITE">WHITE</option>
+                <option value="BROWN">BROWN</option>
+            </select>
+        </label> <br>
+        <label> Nationality
+            <select class="custom-select" name="nationality">
+                <option value="RUSSIA">RUSSIA</option>
+                <option value="USA">USA</option>
+                <option value="ITALY">ITALY</option>
+                <option value="NORTH_KOREA">NORTH_KOREA</option>
+            </select>
+        </label> <br>
+        <button class="btn btn-primary" onclick="createChubz()">Commit</button>
+    </form>
+
+    <form action="crud" method="post">
+        <div class="sort">
+            <h2>Sort</h2>
+            <h3>Ascending, descending</h3>
+            <label> Name
+                <input name="sort_Name" type="radio" value="asc"/>
+                <input name="sort_Name" type="radio" value="dsc"/>
+            </label> <br>
+            <label> X
+                <input name="sort_X" type="radio" value="asc"/>
+                <input name="sort_X" type="radio" value="dsc"/>
+            </label> <br>
+            <label> Y
+                <input name="sort_Y" type="radio" value="asc"/>
+                <input name="sort_Y" type="radio" value="dsc"/>
+            </label> <br>
+            <label> Created
+                <input name="sort_Created" type="radio" value="asc"/>
+                <input name="sort_Created" type="radio" value="dsc"/>
+            </label> <br>
+            <label> Salary
+                <input name="sort_Salary" type="radio" value="asc"/>
+                <input name="sort_Salary" type="radio" value="dsc"/>
+            </label> <br>
+            <label> Hired
+                <input name="sort_Hired" type="radio" value="asc"/>
+                <input name="sort_Hired" type="radio" value="dsc"/>
+            </label> <br>
+            <label> Quit
+                <input name="sort_Quit" type="radio" value="asc"/>
+                <input name="sort_Quit" type="radio" value="dsc"/>
+            </label> <br>
+            <label> Status
+                <input name="sort_Status" type="radio" value="asc"/>
+                <input name="sort_Status" type="radio" value="dsc"/>
+            </label> <br>
+            <label> Passport
+                <input name="sort_Passport" type="radio" value="asc"/>
+                <input name="sort_Passport" type="radio" value="dsc"/>
+            </label> <br>
+            <label> Eye Color
+                <input name="sort_EyeColor" type="radio" value="asc"/>
+                <input name="sort_EyeColor" type="radio" value="dsc"/>
+            </label> <br>
+            <label> Hair Color
+                <input name="sort_HairColor" type="radio" value="asc"/>
+                <input name="sort_HairColor" type="radio" value="dsc"/>
+            </label> <br>
+            <label> Nationality
+                <input name="sort_Nationality" type="radio" value="asc"/>
+                <input name="sort_Nationality" type="radio" value="dsc"/>
+            </label> <br>
+        </div>
+
+        <div class="filter">
+            <h2>Filter</h2>
+            <label> Name
+                <select class="custom-select" name="name">
+                    <option value="lt"> <</option>
+                    <option value="lte"> <=</option>
+                    <option value="eq"> =</option>
+                    <option value="gte"> >=</option>
+                    <option value="gt"> ></option>
+                </select>
+                <input name="name-value" type="text">
+            </label>
+            <label> X
+                <select class="custom-select" name="x">
+                    <option value="lt"><</option>
+                    <option value="lte"><=</option>
+                    <option value="eq">=</option>
+                    <option value="gte">>=</option>
+                    <option value="gt">></option>
+                </select>
+                <input name="x-value" type="text">
+            </label>
+            <label> Y
+                <select class="custom-select" name="y">
+                    <option value="lt"><</option>
+                    <option value="lte"><=</option>
+                    <option value="eq">=</option>
+                    <option value="gte">>=</option>
+                    <option value="gt">></option>
+                </select>
+                <input name="y-value" type="text">
+            </label>
+            <label> Created
+                <select class="custom-select" name="created">
+                    <option value="lt"><</option>
+                    <option value="lte"><=</option>
+                    <option value="eq">=</option>
+                    <option value="gte">>=</option>
+                    <option value="gt">></option>
+                </select>
+                <input name="created-value" type="text">
+            </label>
+            <label> Salary
+                <select class="custom-select" name="salary">
+                    <optfireion value="lt"><</optfireion>
+                    <option value="lte"><=</option>
+                    <option value="eq">=</option>
+                    <option value="gte">>=</option>
+                    <option value="gt">></option>
+                </select>
+                <input name="salary-value" type="text">
+            </label>
+            <label> Hired
+                <select class="custom-select" name="hired">
+                    <option value="lt"><</option>
+                    <option value="lte"><=</option>
+                    <option value="eq">=</option>
+                    <option value="gte">>=</option>
+                    <option value="gt">></option>
+                </select>
+                <input name="hired-value" type="text">
+            </label>
+            <label> Quit
+                <select class="custom-select" name="quit">
+                    <option value="lt"><</option>
+                    <option value="lte"><=</option>
+                    <option value="eq">=</option>
+                    <option value="gte">>=</option>
+                    <option value="gt">></option>
+                </select>
+                <input name="quit-value" type="text">
+            </label>
+            <label> Status
+                <select class="custom-select" name="status">
+                    <option value="lt"><</option>
+                    <option value="lte"><=</option>
+                    <option value="eq">=</option>
+                    <option value="gte">>=</option>
+                    <option value="gt">></option>
+                </select>
+                <input name="status-value" type="text">
+            </label>
+            <label> Passport
+                <select class="custom-select" name="passport">
+                    <option value="lt"><</option>
+                    <option value="lte"><=</option>
+                    <option value="eq">=</option>
+                    <option value="gte">>=</option>
+                    <option value="gt">></option>
+                </select>
+                <input name="passport-value" type="text">
+            </label>
+            <label> Eye Color
+                <select class="custom-select" name="eye-color">
+                    <option value="lt"><</option>
+                    <option value="lte"><=</option>
+                    <option value="eq">=</option>
+                    <option value="gte">>=</option>
+                    <option value="gt">></option>
+                </select>
+                <input name="eye-color-value" type="text">
+            </label>
+            <label> Hair Color
+                <select class="custom-select" name="hair-color">
+                    <option value="lt"><</option>
+                    <option value="lte"><=</option>
+                    <option value="eq">=</option>
+                    <option value="gte">>=</option>
+                    <option value="gt">></option>
+                </select>
+                <input name="hair-color-value" type="text">
+            </label>
+            <label> Nationality
+                <select class="custom-select" name="nationality">
+                    <option value="lt"><</option>
+                    <option value="lte"><=</option>
+                    <option value="eq">=</option>
+                    <option value="gte">>=</option>
+                    <option value="gt">></option>
+                </select>
+                <input name="nationality-value" type="text">
+            </label>
+        </div>
+
+        <div class="find">
+            <h2>Search</h2>
+            <label> Limit
+                <input type="text"/>
+            </label>
+            <label> Offset
+                <input type="text"/>
+            </label>
+            <input class="btn btn-secondary" type="submit" value="Найти">
+        </div>
+    </form>
+
+    <div class="delete">
+        <h2>Delete</h2>
+        <label> Id <input id="delete-id" type="text">
+            <button class="btn btn-danger" onclick="deleteChubz()" type="button">DELETE</button>
+        </label>
+    </div>
+    <table class="container-fluid">
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>X</th>
+            <th>Y</th>
+            <th>Created</th>
+            <th>Salary</th>
+            <th>Hired</th>
+            <th>Quit</th>
+            <th>Status</th>
+            <th>Passport</th>
+            <th>Eye Color</th>
+            <th>Hair Color</th>
+            <th>Nationality</th>
+        </tr>
+        <tr th:each="worker : ${workers}">
+            <td th:text="${worker.id}"></td>
+            <td th:text="${worker.name}"></td>
+            <td th:text="${worker.coordinates.x}"></td>
+            <td th:text="${worker.coordinates.y}"></td>
+            <td th:text="${worker.created}"></td>
+            <td th:text="${worker.salary}"></td>
+            <td th:text="${worker.hired}"></td>
+            <td th:text="${worker.quit}"></td>
+            <td th:text="${worker.status}"></td>
+            <td th:text="${worker.person.passport}"></td>
+            <td th:text="${worker.person.eyeColor}"></td>
+            <td th:text="${worker.person.hairColor}"></td>
+            <td th:text="${worker.person.nationality}"></td>
+        </tr>
+    </table>
+</div>
+</body>
+<script>
+    document.getElementById('created-date').datepicker({})
+    document.getElementById('hired-date').datepicker({})
+    document.getElementById('quit-date').datepicker({})
+
+    function deleteChubz() {
+        let id = document.getElementById('delete-id')
+        if (id == null) return
+
+        fetch(`crud/${id.value}`, {
+            method: 'delete'
+        }).then(null, alert)
+    }
+
+    function createChubz() {
+        let formElement = document.getElementById('worker-create-form');
+        const formElementData = new FormData(formElement)
+        const myData = new FormData()
+        let id = formElementData.get('id')
+
+        for (let [name, value] of formElementData) {
+            myData.append(name, value)
+        }
+
+        let request = {
+            method: '',
+            body: myData
+        }
+
+        if (id != null && id.trim() !== '') {
+            request.method = 'PUT'
+            fetch(`crud/${id}`, request).then(null, alert)
+        } else {
+            request.method = 'POST'
+            fetch(`crud`, request).then(null, alert)
+        }
+    }
+</script>
+</html>
