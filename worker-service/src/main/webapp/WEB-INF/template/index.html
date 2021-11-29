@@ -138,7 +138,9 @@
             }
         }
 
-        window.location.href += query
+        let href = window.location.href;
+
+        window.location.href = href.substring(0, href.indexOf('?')) + query
 
         return false;
     }

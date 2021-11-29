@@ -37,7 +37,7 @@ public class Worker {
 		this.id = id;
 		this.name = requireNonNull(name, "name cannot be null");
 		this.coordinates = requireNonNull(coordinates, "coordinates cannot be null");
-		this.created = requireNonNull(created, "created cannot be null");
+		this.created = created;
 		this.salary = salary;
 		this.hired = requireNonNull(hired, "hired cannot be null");
 		this.quit = quit;
