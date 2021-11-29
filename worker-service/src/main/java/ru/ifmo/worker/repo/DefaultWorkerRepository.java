@@ -46,8 +46,8 @@ public class DefaultWorkerRepository implements WorkerRepository {
 
 	@Override
 	public Optional<Worker> findBy(int id) {
-		Worker worker = jdbc.queryForObject(SELECT_SQL + " WHERE id=?", WORKER_ROW_MAPPER, id);
-		return Optional.ofNullable(worker);
+		List<Worker> workers = jdbc.query(SELECT_SQL + " WHERE id=?", WORKER_ROW_MAPPER, id);
+		return workers.isEmpty() ? Optional.empty() : Optional.of(workers.get(0));
 	}
 
 	@Override
@@ -82,9 +82,9 @@ public class DefaultWorkerRepository implements WorkerRepository {
 	private String buildLimitString(Page page) {
 		if (page != null) {
 			if (page.getLimit() != 0) {
-				return format("LIMIT %d OFFSET %d", page.getLimit(), page.getOffset());
+				return format(" LIMIT %d OFFSET %d", page.getLimit(), page.getOffset());
 			}
-			return "OFFSET " + page.getOffset();
+			return " OFFSET " + page.getOffset();
 		}
 		return "";
 	}
@@ -106,7 +106,6 @@ public class DefaultWorkerRepository implements WorkerRepository {
 		final String deleteWorkerSql = new DeleteBuilder(workersTable)
 				.where("id=" + id)
 				.toString();
-
 		try {
 			return 1 == jdbc.update(deleteWorkerSql);
 		} catch (DataAccessException e) {
