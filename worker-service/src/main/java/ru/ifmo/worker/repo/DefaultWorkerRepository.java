@@ -5,6 +5,7 @@ import ca.krasnay.sqlbuilder.InsertBuilder;
 import ca.krasnay.sqlbuilder.SelectBuilder;
 import ca.krasnay.sqlbuilder.UpdateCreator;
 import lombok.var;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import ru.ifmo.util.query.*;
@@ -103,31 +104,51 @@ public class DefaultWorkerRepository implements WorkerRepository {
 
 	@Override
 	public List<Group> countGrouped() {
-		return jdbc.query("SELECT count(*) as count, x, y FROM " + WORKERS_TABLE + " GROUP BY x, y", GROUP_ROW_MAPPER);
+		return jdbc.query("SELECT count(*) as count, x, y FROM " + WORKERS_TABLE +
+		                  " GROUP BY x, y", GROUP_ROW_MAPPER);
 	}
 
 	@Override
 	public boolean update(Worker instance) {
-		var workers = new UpdateCreator(WORKERS_TABLE)
+		String passport = queryPassportOf(instance);
+		Person person = instance.getPerson();
+		var people = buildUpdateFor(person, passport);
+		var workers = buildUpdateForWorker(instance);
+		return 1 == jdbc.update(people) &&
+		       1 == jdbc.update(workers);
+	}
+
+	private String queryPassportOf(Worker instance) {
+		String passport;
+		try {
+			passport = jdbc.queryForObject("SELECT passport FROM " + WORKERS_TABLE +
+			                               " WHERE id = " + instance.getId(),
+			                               String.class);
+		} catch (DataAccessException e) {
+			throw new IllegalArgumentException("Worker not found for id = " + instance.getId());
+		}
+		return passport;
+	}
+
+	private UpdateCreator buildUpdateFor(Person person, String passport) {
+		return new UpdateCreator(PEOPLE_TABLE)
+				.setValue(Column.PASSPORT.getName(), person.getPassport())
+				.setValue(Column.EYE_COLOR.getName(), person.getEyeColor().toString())
+				.setValue(Column.HAIR_COLOR.getName(), person.getHairColor().toString())
+				.setValue(Column.NATIONALITY.getName(), person.getNationality().toString())
+				.whereEquals(Column.PASSPORT.getName(), passport);
+	}
+
+	private UpdateCreator buildUpdateForWorker(Worker instance) {
+		return new UpdateCreator(WORKERS_TABLE)
 				.setValue(Column.NAME.getName(), instance.getName())
 				.setValue(Column.X.getName(), instance.getCoordinates().getX())
 				.setValue(Column.Y.getName(), instance.getCoordinates().getY())
 				.setValue(Column.SALARY.getName(), instance.getSalary())
 				.setValue(Column.HIRED.getName(), instance.getHired())
 				.setValue(Column.QUIT.getName(), instance.getQuit())
-				.setValue(Column.STATUS.getName(), instance.getStatus())
+				.setValue(Column.STATUS.getName(), instance.getStatus().toString())
 				.whereEquals(Column.ID.getName(), instance.getId());
-
-		Person person = instance.getPerson();
-		var people = new UpdateCreator(PEOPLE_TABLE)
-				.setValue(Column.PASSPORT.getName(), person.getPassport())
-				.setValue(Column.EYE_COLOR.getName(), person.getEyeColor())
-				.setValue(Column.HAIR_COLOR.getName(), person.getHairColor())
-				.setValue(Column.NATIONALITY.getName(), person.getNationality())
-				.whereEquals(Column.PASSPORT.getName(), person.getPassport());
-
-		return 1 == jdbc.update(people) &&
-		       1 == jdbc.update(workers);
 	}
 
 	@Override

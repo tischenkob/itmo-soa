@@ -11,6 +11,7 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import ru.ifmo.util.XmlConverter;
 import ru.ifmo.util.query.Group;
 import ru.ifmo.worker.CrudViewServlet;
+import ru.ifmo.worker.ExtraViewServlet;
 import ru.ifmo.worker.model.Coordinates;
 import ru.ifmo.worker.model.Country;
 import ru.ifmo.worker.model.Person;
@@ -61,18 +62,25 @@ public class Application implements ServletContextListener {
 		Dynamic worker = context.addServlet("Crud", crudServlet);
 		worker.addMapping(pathBase + "/workers", pathBase + "/workers/*");
 
+		TemplateEngine engine = new TemplateEngine();
+		engine.setTemplateResolver(templateResolverFrom(context));
+
+		CrudViewServlet crudViewServlet = new CrudViewServlet(service, engine);
+		Dynamic workerView = context.addServlet("CrudView", crudViewServlet);
+		workerView.addMapping("/index", "/index/*");
+
+		ExtraViewServlet extraViewServlet = new ExtraViewServlet(service, engine);
+		Dynamic extraView = context.addServlet("ExtraView", extraViewServlet);
+		extraView.addMapping("/extra", "/extra/*");
+	}
+
+	private AbstractConfigurableTemplateResolver templateResolverFrom(ServletContext context) {
 		AbstractConfigurableTemplateResolver resolver = new ServletContextTemplateResolver(context);
 		resolver.setPrefix("/WEB-INF/template/");
 		resolver.setSuffix(".html");
 		resolver.setTemplateMode("HTML5");
 		resolver.setCharacterEncoding("utf-8");
-
-		TemplateEngine engine = new TemplateEngine();
-		engine.setTemplateResolver(resolver);
-
-		CrudViewServlet crudViewServlet = new CrudViewServlet(service, engine);
-		Dynamic workerView = context.addServlet("CrudView", crudViewServlet);
-		workerView.addMapping("/crud", "/crud/*");
+		return resolver;
 	}
 
 	@SneakyThrows

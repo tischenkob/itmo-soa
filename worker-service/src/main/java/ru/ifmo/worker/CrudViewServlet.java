@@ -33,6 +33,7 @@ public class CrudViewServlet extends HttpServlet {
 	private final WorkerService service;
 	private final ITemplateEngine templateEngine;
 	private final Supplier<NoSuchElementException> workerNotFoundException = () -> new NoSuchElementException("Worker not found.");
+	private final String viewName = "index";
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -47,16 +48,20 @@ public class CrudViewServlet extends HttpServlet {
 		}
 		Context viewContext = new Context();
 		viewContext.setVariable("workers", workers);
-		templateEngine.process("crud", viewContext, response.getWriter());
+		templateEngine.process(viewName, viewContext, response.getWriter());
 		response.setStatus(SC_OK);
 	}
 
 	@Override
 	@SneakyThrows
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+		if ("put".equals(req.getParameter("_method"))) {
+			doPut(req, resp);
+			return;
+		}
 		service.save(workerFromBodyOf(req));
 		resp.setStatus(SC_CREATED);
-		resp.sendRedirect("/crud");
+//		resp.sendRedirect(getLocation(req));
 	}
 
 	@Override
@@ -66,7 +71,7 @@ public class CrudViewServlet extends HttpServlet {
 		worker.setId(idParsedFrom(req));
 		service.update(worker);
 		resp.setStatus(SC_OK);
-		resp.sendRedirect("/crud");
+//		resp.sendRedirect(getLocation(req));
 	}
 
 	@Override
@@ -74,7 +79,11 @@ public class CrudViewServlet extends HttpServlet {
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
 		service.deleteBy(idParsedFrom(req));
 		resp.setStatus(SC_OK);
-		resp.sendRedirect("/crud");
+//		resp.sendRedirect(getLocation(req));
+	}
+
+	private String getLocation(HttpServletRequest req) {
+		return req.getContextPath() + "/" + viewName;
 	}
 
 	@SneakyThrows
@@ -90,7 +99,6 @@ public class CrudViewServlet extends HttpServlet {
 		             .name(requireString(req, "name"))
 		             .coordinates(Coordinates.of((float) requireNumber(req, "x"),
 		                                         (int) requireNumber(req, "y")))
-		             .created(requireDate(req, "created"))
 		             .salary((int) requireNumber(req, "salary"))
 		             .hired(requireDate(req, "hired"))
 		             .quit(map(req.getParameter("quit"), LocalDateTime::parse))

@@ -1,6 +1,8 @@
 package ru.ifmo.worker.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import ru.ifmo.util.query.Group;
 import ru.ifmo.util.query.QueryParameters;
 import ru.ifmo.worker.model.Worker;
@@ -30,9 +32,15 @@ public class DefaultWorkerService implements WorkerService {
 
 	@Override
 	public void update(Worker instance) {
-		boolean operationSuccessful = repository.update(instance);
-		if (!operationSuccessful) {
-			throw new IllegalArgumentException("Validation violation for worker " + instance.getName());
+		try {
+			boolean operationSuccessful = repository.update(instance);
+			if (!operationSuccessful) {
+				throw new IllegalArgumentException("Validation violation for worker " + instance.getName());
+			}
+		} catch (DataAccessException e) {
+			System.err.println(e.getMessage());
+			throw new IllegalArgumentException("Worker does not exist or validation violation for " +
+			                                   instance.getName());
 		}
 	}
 
@@ -46,9 +54,17 @@ public class DefaultWorkerService implements WorkerService {
 
 	@Override
 	public void save(Worker instance) {
-		boolean operationSuccessful = repository.save(instance);
-		if (!operationSuccessful) {
-			throw new IllegalArgumentException("Validation violation for worker " + instance.getName());
+		try {
+			boolean operationSuccessful = repository.save(instance);
+			if (!operationSuccessful) {
+				throw new IllegalArgumentException("Validation violation for worker " +
+				                                   instance.getName());
+			}
+		} catch (DuplicateKeyException e) {
+			System.err.println(e.getMessage());
+			throw new IllegalArgumentException("Worker with passport " +
+			                                   instance.getPerson().getPassport() +
+			                                   " already exists");
 		}
 	}
 

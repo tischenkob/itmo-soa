@@ -2,7 +2,6 @@ package ru.ifmo.worker.rest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.var;
 import ru.ifmo.util.XmlConverter;
 import ru.ifmo.util.query.Group;
 import ru.ifmo.worker.model.Worker;
@@ -11,6 +10,7 @@ import ru.ifmo.worker.service.WorkerService;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
@@ -45,7 +45,7 @@ public class ExtraWorkerServlet extends HttpServlet {
 	@SneakyThrows
 	private void handleGrouped(HttpServletRequest request, HttpServletResponse response) {
 		List<Group> groups = service.countGrouped();
-		try (var writer = response.getWriter()) {
+		try (PrintWriter writer = response.getWriter()) {
 			writer.print(converter.toXml(groups));
 		}
 		response.setStatus(SC_OK);
@@ -54,7 +54,7 @@ public class ExtraWorkerServlet extends HttpServlet {
 	@SneakyThrows
 	private void handleUnique(HttpServletRequest request, HttpServletResponse response) {
 		EnumSet<Worker.Status> statuses = service.findDistinctStatuses();
-		try (var writer = response.getWriter()) {
+		try (PrintWriter writer = response.getWriter()) {
 			writer.print(converter.toXml(statuses));
 		}
 		response.setStatus(SC_OK);
@@ -64,7 +64,7 @@ public class ExtraWorkerServlet extends HttpServlet {
 	private void handleNamed(HttpServletRequest request, HttpServletResponse response) {
 		String substring = request.getParameter("like");
 		Collection<Worker> foundWorkers = service.findNamedLike(substring);
-		try (var writer = response.getWriter()) {
+		try (PrintWriter writer = response.getWriter()) {
 			writer.print(converter.toXml(foundWorkers));
 		}
 		response.setStatus(SC_OK);
