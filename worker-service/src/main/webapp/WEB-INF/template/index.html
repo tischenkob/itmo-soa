@@ -74,7 +74,7 @@
             <div class="delete">
                 <h2>Delete</h2>
                 <label> Id <input id="delete-id" type="text">
-                    <button class="btn btn-danger" onclick="deleteChubz()" type="button">DELETE</button>
+                    <input class="btn btn-danger" onclick="deleteChubz()" type="button">DELETE
                 </label>
             </div>
         </div>
@@ -86,9 +86,6 @@
 </div>
 </body>
 <script>
-    document.getElementById('hired-date').datepicker({})
-    document.getElementById('quit-date').datepicker({})
-
     function deleteChubz() {
         let id = document.getElementById('delete-id')
         if (id == null) return

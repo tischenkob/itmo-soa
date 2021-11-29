@@ -29,16 +29,19 @@ import static ru.ifmo.util.Nulls.map;
 public class DefaultWorkerRepository implements WorkerRepository {
 
 	private final JdbcTemplate jdbc;
-	private final String PEOPLE_TABLE = "soa_people";
-	private final String WORKERS_TABLE = "soa_workers";
+	private final String peopleTable;
+	private final String workersTable;
 	private final RowMapper<Worker> WORKER_ROW_MAPPER = new WorkerRowMapper();
 	private final RowMapper<Group> GROUP_ROW_MAPPER = new GroupRowMapper();
 	private final String JOIN_COLUMN = "passport";
-	private final String SELECT_SQL = format("SELECT * FROM %s JOIN %s USING (%s)",
-	                                         WORKERS_TABLE, PEOPLE_TABLE, JOIN_COLUMN);
+	private final String SELECT_SQL;
 
-	public DefaultWorkerRepository(DataSource dataSource) {
+	public DefaultWorkerRepository(DataSource dataSource, String peopleTable, String workersTable) {
 		jdbc = new JdbcTemplate(dataSource);
+		this.peopleTable = peopleTable;
+		this.workersTable = workersTable;
+		SELECT_SQL = format("SELECT * FROM %s JOIN %s USING (%s)",
+		                    workersTable, peopleTable, JOIN_COLUMN);
 	}
 
 	@Override
@@ -55,8 +58,8 @@ public class DefaultWorkerRepository implements WorkerRepository {
 	@Override
 	public List<Worker> findWith(QueryParameters parameters) {
 		SelectBuilder builder = select()
-				.from(WORKERS_TABLE)
-				.join(PEOPLE_TABLE + " USING (" + JOIN_COLUMN + ")");
+				.from(workersTable)
+				.join(peopleTable + " USING (" + JOIN_COLUMN + ")");
 
 		for (Filter filter : parameters.getFilters()) {
 			builder.and(filter.toString());
@@ -88,24 +91,37 @@ public class DefaultWorkerRepository implements WorkerRepository {
 
 	@Override
 	public boolean save(Worker instance) {
-		int insertedPeople = jdbc.update(insertFor(instance.getPerson()));
-		int insertedWorkers = jdbc.update(insertFor(instance));
-		return insertedPeople == 1 && insertedWorkers == 1;
+		try {
+			int insertedPeople = jdbc.update(insertFor(instance.getPerson()));
+			int insertedWorkers = jdbc.update(insertFor(instance));
+			return insertedPeople == 1 && insertedWorkers == 1;
+		} catch (DataAccessException e) {
+			throw new IllegalArgumentException(e.getMessage());
+		}
+
 	}
 
 	@Override
 	public boolean deleteBy(int id) {
-		final String deleteWorkerSql = new DeleteBuilder(WORKERS_TABLE)
+		final String deleteWorkerSql = new DeleteBuilder(workersTable)
 				.where("id=" + id)
 				.toString();
 
-		return 1 == jdbc.update(deleteWorkerSql);
+		try {
+			return 1 == jdbc.update(deleteWorkerSql);
+		} catch (DataAccessException e) {
+			throw new IllegalArgumentException(e.getMessage());
+		}
 	}
 
 	@Override
 	public List<Group> countGrouped() {
-		return jdbc.query("SELECT count(*) as count, x, y FROM " + WORKERS_TABLE +
-		                  " GROUP BY x, y", GROUP_ROW_MAPPER);
+		try {
+			return jdbc.query("SELECT count(*) as count, x, y FROM " + workersTable +
+			                  " GROUP BY x, y", GROUP_ROW_MAPPER);
+		} catch (DataAccessException e) {
+			throw new IllegalArgumentException(e.getMessage());
+		}
 	}
 
 	@Override
@@ -114,14 +130,18 @@ public class DefaultWorkerRepository implements WorkerRepository {
 		Person person = instance.getPerson();
 		var people = buildUpdateFor(person, passport);
 		var workers = buildUpdateForWorker(instance);
-		return 1 == jdbc.update(people) &&
-		       1 == jdbc.update(workers);
+		try {
+			return 1 == jdbc.update(people) &&
+			       1 == jdbc.update(workers);
+		} catch (DataAccessException e) {
+			throw new IllegalArgumentException(e.getMessage());
+		}
 	}
 
 	private String queryPassportOf(Worker instance) {
 		String passport;
 		try {
-			passport = jdbc.queryForObject("SELECT passport FROM " + WORKERS_TABLE +
+			passport = jdbc.queryForObject("SELECT passport FROM " + workersTable +
 			                               " WHERE id = " + instance.getId(),
 			                               String.class);
 		} catch (DataAccessException e) {
@@ -131,7 +151,7 @@ public class DefaultWorkerRepository implements WorkerRepository {
 	}
 
 	private UpdateCreator buildUpdateFor(Person person, String passport) {
-		return new UpdateCreator(PEOPLE_TABLE)
+		return new UpdateCreator(peopleTable)
 				.setValue(Column.PASSPORT.getName(), person.getPassport())
 				.setValue(Column.EYE_COLOR.getName(), person.getEyeColor().toString())
 				.setValue(Column.HAIR_COLOR.getName(), person.getHairColor().toString())
@@ -140,7 +160,7 @@ public class DefaultWorkerRepository implements WorkerRepository {
 	}
 
 	private UpdateCreator buildUpdateForWorker(Worker instance) {
-		return new UpdateCreator(WORKERS_TABLE)
+		return new UpdateCreator(workersTable)
 				.setValue(Column.NAME.getName(), instance.getName())
 				.setValue(Column.X.getName(), instance.getCoordinates().getX())
 				.setValue(Column.Y.getName(), instance.getCoordinates().getY())
@@ -153,7 +173,7 @@ public class DefaultWorkerRepository implements WorkerRepository {
 
 	@Override
 	public Collection<String> findDistinctStatusValues() {
-		String sql = "SELECT DISTINCT status FROM " + WORKERS_TABLE;
+		String sql = "SELECT DISTINCT status FROM " + workersTable;
 		return jdbc.queryForList(sql, null, String.class);
 	}
 
@@ -166,7 +186,7 @@ public class DefaultWorkerRepository implements WorkerRepository {
 	}
 
 	private String insertFor(Person person) {
-		return new InsertBuilder(PEOPLE_TABLE)
+		return new InsertBuilder(peopleTable)
 				.set("passport", quote(person.getPassport()))
 				.set("eye_color", quote(person.getEyeColor()))
 				.set("hair_color", quote(person.getHairColor()))
@@ -175,7 +195,7 @@ public class DefaultWorkerRepository implements WorkerRepository {
 	}
 
 	private String insertFor(Worker instance) {
-		return new InsertBuilder(WORKERS_TABLE)
+		return new InsertBuilder(workersTable)
 				.set("name", quote(instance.getName()))
 				.set("x", String.valueOf(instance.getCoordinates().getX()))
 				.set("y", String.valueOf(instance.getCoordinates().getY()))

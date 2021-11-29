@@ -23,7 +23,6 @@ import java.util.function.Supplier;
 
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static ru.ifmo.util.Nulls.map;
 import static ru.ifmo.util.Requests.containsId;
 import static ru.ifmo.util.Requests.idParsedFrom;
 import static ru.ifmo.worker.api.ParameterExtractor.parametersFrom;
@@ -101,10 +100,20 @@ public class CrudViewServlet extends HttpServlet {
 		                                         (int) requireNumber(req, "y")))
 		             .salary((int) requireNumber(req, "salary"))
 		             .hired(requireDate(req, "hired"))
-		             .quit(map(req.getParameter("quit"), LocalDateTime::parse))
+		             .quit(optionalDate(req, "quit"))
 		             .status(Worker.Status.valueOf(requireString(req, "status")))
 		             .person(person)
 		             .build();
+	}
+
+	private LocalDateTime optionalDate(HttpServletRequest req, String parameter) {
+		String object = req.getParameter(parameter);
+		if (object == null) return null;
+		try {
+			return LocalDateTime.parse(object);
+		} catch (DateTimeParseException e) {
+			throw new IllegalArgumentException("quit must be a valid date or null");
+		}
 	}
 
 	private String requireString(HttpServletRequest parameters, String parameter) {

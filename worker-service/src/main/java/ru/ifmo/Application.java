@@ -42,13 +42,23 @@ public class Application implements ServletContextListener {
 	private static final String heliosPropsPath = "/WEB-INF/helios.properties";
 	private static final String dockerPropsPath = "/WEB-INF/docker.properties";
 
+	private final String peopleTable = "soa_people";
+	private final String workersTable = "soa_workers";
+	private final String schemaPropertyName = "schema.name";
+	private final String configurationPropertyName = "app.config";
+
 	@Override
 	@SneakyThrows
 	public void contextInitialized(ServletContextEvent sce) {
 		ServletContext context = sce.getServletContext();
 		DataSource dataSource = importDataSource(context);
 
-		WorkerRepository repository = new DefaultWorkerRepository(dataSource);
+		String schema = System.getProperty(schemaPropertyName);
+		schema = schema == null ? "" : schema + ".";
+
+		WorkerRepository repository = new DefaultWorkerRepository(dataSource,
+		                                                          schema + peopleTable,
+		                                                          schema + workersTable);
 		WorkerService service = new DefaultWorkerService(repository);
 		XmlConverter xmlConverter = configureXmlConverter();
 
@@ -86,7 +96,7 @@ public class Application implements ServletContextListener {
 	@SneakyThrows
 	private DataSource importDataSource(ServletContext context) {
 		Properties properties = new Properties();
-		String configuration = System.getProperties().getProperty("app.config");
+		String configuration = System.getProperties().getProperty(configurationPropertyName);
 		String propsPath = "helios".equals(configuration)
 		                   ? heliosPropsPath
 		                   : dockerPropsPath;

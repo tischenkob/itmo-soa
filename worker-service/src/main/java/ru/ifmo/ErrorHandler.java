@@ -1,8 +1,5 @@
 package ru.ifmo;
 
-import lombok.extern.slf4j.Slf4j;
-
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -11,7 +8,8 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import static javax.servlet.RequestDispatcher.*;
-import static javax.servlet.http.HttpServletResponse.*;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
 @WebServlet("/error")
 public class ErrorHandler extends HttpServlet {
@@ -24,7 +22,7 @@ public class ErrorHandler extends HttpServlet {
 		String servletName = (String) request.getAttribute(ERROR_SERVLET_NAME);
 		System.out.printf("ERROR: Exception '%s' from servlet '%s'", message, servletName);
 
-		if (exception instanceof IllegalArgumentException) {
+		if (exception instanceof IllegalArgumentException || exception instanceof NullPointerException) {
 			response.sendError(SC_BAD_REQUEST, message);
 		}
 

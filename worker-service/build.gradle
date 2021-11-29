@@ -25,6 +25,10 @@ task deploy(type: Exec, dependsOn: war) {
             "-d", "application"
 }
 
+task helios(type: Exec, dependsOn: war) {
+    commandLine "./env/helios.sh"
+}
+
 test {
     useJUnitPlatform()
 }
