@@ -20,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -96,7 +97,7 @@ public class DefaultWorkerRepository implements WorkerRepository {
 			int insertedWorkers = jdbc.update(insertFor(instance));
 			return insertedPeople == 1 && insertedWorkers == 1;
 		} catch (DataAccessException e) {
-			throw new IllegalArgumentException(e.getMessage());
+			return false;
 		}
 
 	}
@@ -109,7 +110,7 @@ public class DefaultWorkerRepository implements WorkerRepository {
 		try {
 			return 1 == jdbc.update(deleteWorkerSql);
 		} catch (DataAccessException e) {
-			throw new IllegalArgumentException(e.getMessage());
+			return false;
 		}
 	}
 
@@ -119,7 +120,7 @@ public class DefaultWorkerRepository implements WorkerRepository {
 			return jdbc.query("SELECT count(*) as count, x, y FROM " + workersTable +
 			                  " GROUP BY x, y", GROUP_ROW_MAPPER);
 		} catch (DataAccessException e) {
-			throw new IllegalArgumentException(e.getMessage());
+			return Collections.emptyList();
 		}
 	}
 
@@ -133,7 +134,7 @@ public class DefaultWorkerRepository implements WorkerRepository {
 			return 1 == jdbc.update(people) &&
 			       1 == jdbc.update(workers);
 		} catch (DataAccessException e) {
-			throw new IllegalArgumentException(e.getMessage());
+			return false;
 		}
 	}
 
@@ -173,7 +174,11 @@ public class DefaultWorkerRepository implements WorkerRepository {
 	@Override
 	public Collection<String> findDistinctStatusValues() {
 		String sql = "SELECT DISTINCT status FROM " + workersTable;
-		return jdbc.queryForList(sql, null, String.class);
+		try {
+			return jdbc.queryForList(sql, null, String.class);
+		} catch (DataAccessException e) {
+			return Collections.emptyList();
+		}
 	}
 
 	@Override
@@ -181,7 +186,11 @@ public class DefaultWorkerRepository implements WorkerRepository {
 		String sql = SELECT_SQL +
 		             " WHERE " + Column.NAME.getName() +
 		             " LIKE '%" + substring + "%'";
-		return jdbc.query(sql, WORKER_ROW_MAPPER);
+		try {
+			return jdbc.query(sql, WORKER_ROW_MAPPER);
+		} catch (DataAccessException e) {
+			return Collections.emptyList();
+		}
 	}
 
 	private String insertFor(Person person) {

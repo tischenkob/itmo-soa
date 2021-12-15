@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru-RU">
+<html lang="ru-RU" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8">
     <title>Sl@ves</title>
@@ -18,8 +18,8 @@
     <script src="js/shards.min.js"></script>
 </head>
 <body>
-<a href="extra"> Extra </a>
 <div class="container">
+    <a href="extra"> Extra </a>
     <header>
         <h1>Chubziki</h1>
     </header>
@@ -50,8 +50,8 @@
                         <div th:replace="fragments/form.html :: sort('Hired',       'hired')"></div>
                         <div th:replace="fragments/form.html :: sort('Quit',        'quit')"></div>
                         <div th:replace="fragments/form.html :: sort('Status',      'status')"></div>
-                        <div th:replace="fragments/form.html :: sort('Eye color',   'eye-color')"></div>
-                        <div th:replace="fragments/form.html :: sort('Hair color',  'hair-color')"></div>
+                        <div th:replace="fragments/form.html :: sort('Eye color',   'eye_color')"></div>
+                        <div th:replace="fragments/form.html :: sort('Hair color',  'hair_color')"></div>
                         <div th:replace="fragments/form.html :: sort('Nationality', 'nationality')"></div>
                     </div>
 
@@ -65,8 +65,8 @@
                         <div th:replace="fragments/form.html :: filter('Hired',       'hired')"></div>
                         <div th:replace="fragments/form.html :: filter('Quit',        'quit')"></div>
                         <div th:replace="fragments/form.html :: filter('Status',      'status')"></div>
-                        <div th:replace="fragments/form.html :: filter('Eye color',   'eye-color')"></div>
-                        <div th:replace="fragments/form.html :: filter('Hair color',  'hair-color')"></div>
+                        <div th:replace="fragments/form.html :: filter('Eye color',   'eye_color')"></div>
+                        <div th:replace="fragments/form.html :: filter('Hair color',  'hair_color')"></div>
                         <div th:replace="fragments/form.html :: filter('Nationality', 'nationality')"></div>
                     </div>
                 </div>
@@ -74,7 +74,7 @@
             <div class="delete">
                 <h2>Delete</h2>
                 <label> Id <input id="delete-id" type="text">
-                    <input class="btn btn-danger" onclick="deleteChubz()" type="button">DELETE
+                    <button class="btn btn-danger" onclick="deleteChubz()" type="button">DELETE</button>
                 </label>
             </div>
         </div>

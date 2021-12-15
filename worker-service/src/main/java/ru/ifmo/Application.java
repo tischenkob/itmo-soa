@@ -77,7 +77,7 @@ public class Application implements ServletContextListener {
 
 		CrudViewServlet crudViewServlet = new CrudViewServlet(service, engine);
 		Dynamic workerView = context.addServlet("CrudView", crudViewServlet);
-		workerView.addMapping("/index", "/index/*");
+		workerView.addMapping("/workers", "/workers/*");
 
 		ExtraViewServlet extraViewServlet = new ExtraViewServlet(service, engine);
 		Dynamic extraView = context.addServlet("ExtraView", extraViewServlet);
