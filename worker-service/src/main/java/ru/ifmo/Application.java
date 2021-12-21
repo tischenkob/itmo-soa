@@ -42,10 +42,10 @@ public class Application implements ServletContextListener {
 	private static final String heliosPropsPath = "/WEB-INF/helios.properties";
 	private static final String dockerPropsPath = "/WEB-INF/docker.properties";
 
-	private final String peopleTable = "soa_people";
-	private final String workersTable = "soa_workers";
-	private final String schemaPropertyName = "schema.name";
-	private final String configurationPropertyName = "app.config";
+	private static final String peopleTable = "soa_people";
+	private static final String workersTable = "soa_workers";
+	private static final String schemaPropertyName = "schema.name";
+	private static final String configurationPropertyName = "app.config";
 
 	@Override
 	@SneakyThrows
