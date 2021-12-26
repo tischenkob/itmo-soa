@@ -7,16 +7,16 @@ import java.util.Set;
 
 @Getter
 public class QueryParameters {
-	private final Set<Filter> filters = new HashSet<>();
-	private final Set<Sort> sorts = new HashSet<>();
+	private final Set<Filter> filterSet = new HashSet<>();
+	private final Set<Sort> sortSet = new HashSet<>();
 	Page page;
 
 	public void add(Filter value) {
-		filters.add(value);
+		filterSet.add(value);
 	}
 
 	public void add(Sort value) {
-		sorts.add(value);
+		sortSet.add(value);
 	}
 
 	public void set(Page value) {
@@ -27,6 +27,6 @@ public class QueryParameters {
 	}
 
 	public boolean isEmpty() {
-		return filters.isEmpty() && sorts.isEmpty() && page == null;
+		return filterSet.isEmpty() && sortSet.isEmpty() && page == null;
 	}
 }

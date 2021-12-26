@@ -15,7 +15,6 @@ import static java.lang.Integer.parseInt;
 import static java.util.stream.Collectors.toList;
 
 public class ParameterExtractor {
-
 	private static final List<String> COLUMNS = Arrays.stream(Column.values())
 	                                                  .map(Column::getName)
 	                                                  .collect(toList());
@@ -74,5 +73,4 @@ public class ParameterExtractor {
 				parameters.add(Filter.of(parameter, option, value, usesQuotes));
 		}
 	}
-
 }

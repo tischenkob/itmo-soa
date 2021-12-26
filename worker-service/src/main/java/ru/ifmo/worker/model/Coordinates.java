@@ -3,13 +3,16 @@ package ru.ifmo.worker.model;
 import lombok.Getter;
 import lombok.ToString;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 @Getter
 @ToString
+@XmlRootElement(name = "coordinates")
 public class Coordinates {
 	private float x; //Максимальное 48
 	private int y; //Максимальное 676
 
-	public Coordinates(float x, int y) {
+	private Coordinates(float x, int y) {
 		setX(x);
 		setY(y);
 	}

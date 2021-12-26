@@ -3,6 +3,7 @@ package ru.ifmo.worker.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.stereotype.Service;
 import ru.ifmo.util.query.Group;
 import ru.ifmo.util.query.QueryParameters;
 import ru.ifmo.worker.model.Worker;
@@ -13,6 +14,7 @@ import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+@Service
 @RequiredArgsConstructor
 public class DefaultWorkerService implements WorkerService {
 	private final WorkerRepository repository;

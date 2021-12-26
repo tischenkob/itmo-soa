@@ -1,33 +1,30 @@
 package ru.ifmo;
 
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
 import java.util.NoSuchElementException;
 
-import static javax.servlet.RequestDispatcher.*;
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
-@WebServlet("/error")
-public class ErrorHandler extends HttpServlet {
+@ControllerAdvice
+public class ErrorHandler extends ResponseEntityExceptionHandler {
 
-	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-		Exception exception = (Exception) request.getAttribute(ERROR_EXCEPTION);
-		String message = (String) request.getAttribute(ERROR_MESSAGE);
-		String servletName = (String) request.getAttribute(ERROR_SERVLET_NAME);
-		System.out.printf("ERROR: Exception '%s' from servlet '%s'", message, servletName);
-
-		if (exception instanceof IllegalArgumentException || exception instanceof NullPointerException) {
-			response.sendError(SC_BAD_REQUEST, message);
-		}
-
-		if (exception instanceof NoSuchElementException) {
-			response.sendError(SC_NOT_FOUND, message);
-		}
+	@ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class, NullPointerException.class})
+	protected ResponseEntity<Object> handleIllegalInput(RuntimeException ex, WebRequest request) {
+		System.out.printf("ERROR: Exception '%s' for request %s", ex.getMessage(), request);
+		return handleExceptionInternal(ex, null, new HttpHeaders(), BAD_REQUEST, request);
 	}
+
+	@ExceptionHandler({NoSuchElementException.class})
+	protected ResponseEntity<Object> handleNotFound(RuntimeException ex, WebRequest request) {
+		System.out.printf("ERROR: Exception '%s' for request %s", ex.getMessage(), request);
+		return handleExceptionInternal(ex, null, new HttpHeaders(), NOT_FOUND, request);
+	}
+
 }

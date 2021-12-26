@@ -5,15 +5,24 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import static java.util.Objects.requireNonNull;
 
 @Getter
 @Setter
 @Builder
 @ToString
+@XmlRootElement(name = "person")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Person {
 	private String passport; //не может быть пустой, не null
+	@XmlElement(name = "eye-color")
 	private EyeColor eyeColor; //не null
+	@XmlElement(name = "hair-color")
 	private HairColor hairColor; //не null
 	private Country nationality; //не null
 

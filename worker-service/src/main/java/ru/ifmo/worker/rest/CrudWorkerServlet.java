@@ -1,65 +1,52 @@
 package ru.ifmo.worker.rest;
 
 import lombok.RequiredArgsConstructor;
-import ru.ifmo.util.XmlConverter;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import ru.ifmo.worker.model.Worker;
 import ru.ifmo.worker.service.WorkerService;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
-import static javax.servlet.http.HttpServletResponse.SC_CREATED;
-import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static ru.ifmo.util.Requests.*;
 import static ru.ifmo.worker.api.ParameterExtractor.parametersFrom;
 
+@RestController("/api/workers")
 @RequiredArgsConstructor
-public class CrudWorkerServlet extends HttpServlet {
+public class CrudWorkerServlet {
 	private final WorkerService service;
-	private final XmlConverter converter;
-	private final Supplier<NoSuchElementException> workerNotFoundException = () -> new NoSuchElementException("Worker not found.");
 
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		Object responseContent = containsId(request)
-		                         ? service.findBy(idParsedFrom(request))
-		                                  .orElseThrow(workerNotFoundException)
-		                         : service.findWith(parametersFrom(request));
-
-		try (PrintWriter out = response.getWriter()) {
-			out.println(converter.toXml(responseContent));
-		}
+	@PostMapping
+	@ResponseStatus(HttpStatus.CREATED)
+	public void create(@RequestBody Worker worker) {
+		service.save(worker);
 	}
 
-	@Override
-	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
-		service.deleteBy(idParsedFrom(req));
-		resp.setStatus(SC_OK);
+	@GetMapping
+	public Collection<Worker> readAll(HttpServletRequest request) {
+		return service.findWith(parametersFrom(request));
 	}
 
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		service.save(workerFromBodyOf(req));
-		resp.setStatus(SC_CREATED);
+	@GetMapping("/{id}")
+	public Worker read(@PathVariable int id) {
+		return service.findBy(id).orElseThrow(workerNotFound());
 	}
 
-	@Override
-	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		Worker worker = workerFromBodyOf(req);
-		worker.setId(idParsedFrom(req));
+	private static Supplier<NoSuchElementException> workerNotFound() {
+		return () -> new NoSuchElementException("Worker not found.");
+	}
+
+	@PutMapping("/{id}")
+	public void update(@PathVariable int id, @RequestBody Worker worker) {
+		worker.setId(id);
 		service.update(worker);
-		resp.setStatus(SC_OK);
 	}
 
-	private Worker workerFromBodyOf(HttpServletRequest req) throws IOException {
-		return converter.fromXml(bodyOf(req), Worker.class);
+	@DeleteMapping("/{id}")
+	public void delete(@PathVariable int id) {
+		service.deleteBy(id);
 	}
 
-	public void destroy() {
-	}
 }

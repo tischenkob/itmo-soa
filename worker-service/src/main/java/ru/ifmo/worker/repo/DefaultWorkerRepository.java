@@ -4,43 +4,50 @@ import ca.krasnay.sqlbuilder.DeleteBuilder;
 import ca.krasnay.sqlbuilder.InsertBuilder;
 import ca.krasnay.sqlbuilder.SelectBuilder;
 import ca.krasnay.sqlbuilder.UpdateCreator;
-import lombok.var;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
 import ru.ifmo.util.query.*;
-import ru.ifmo.worker.api.Column;
-import ru.ifmo.worker.model.Coordinates;
-import ru.ifmo.worker.model.Country;
 import ru.ifmo.worker.model.Person;
 import ru.ifmo.worker.model.Worker;
 
-import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import javax.annotation.PostConstruct;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static ru.ifmo.util.Nulls.map;
+import static ru.ifmo.worker.api.Column.*;
 
+@Repository
+@RequiredArgsConstructor
 public class DefaultWorkerRepository implements WorkerRepository {
 
 	private final JdbcTemplate jdbc;
-	private final String peopleTable;
-	private final String workersTable;
-	private final RowMapper<Worker> WORKER_ROW_MAPPER = new WorkerRowMapper();
-	private final RowMapper<Group> GROUP_ROW_MAPPER = new GroupRowMapper();
+	private final RowMapper<Worker> WORKER_ROW_MAPPER;
+	private final RowMapper<Group> GROUP_ROW_MAPPER;
+	@Setter
+	@Value("${systemProperties['database.schema']}")
+	private String schema;
+	@Value("${database.tables.people}")
+	private String peopleTable;
+	@Value("${database.tables.workers}")
+	private String workersTable;
 	private final String JOIN_COLUMN = "passport";
-	private final String SELECT_SQL;
+	private String SELECT_SQL;
 
-	public DefaultWorkerRepository(DataSource dataSource, String peopleTable, String workersTable) {
-		jdbc = new JdbcTemplate(dataSource);
-		this.peopleTable = peopleTable;
-		this.workersTable = workersTable;
+	@PostConstruct
+	void initialize() {
+		if (schema != null) {
+			peopleTable = schema + "." + peopleTable;
+			workersTable = schema + "." + workersTable;
+		}
 		SELECT_SQL = format("SELECT * FROM %s JOIN %s USING (%s)",
 		                    workersTable, peopleTable, JOIN_COLUMN);
 	}
@@ -62,11 +69,11 @@ public class DefaultWorkerRepository implements WorkerRepository {
 				.from(workersTable)
 				.join(peopleTable + " USING (" + JOIN_COLUMN + ")");
 
-		for (Filter filter : parameters.getFilters()) {
+		for (Filter filter : parameters.getFilterSet()) {
 			builder.and(filter.toString());
 		}
 
-		for (Sort sort : parameters.getSorts()) {
+		for (Sort sort : parameters.getSortSet()) {
 			boolean ascending = sort.getOrder() == Sort.Order.ASCENDING;
 			builder.orderBy(sort.getField(), ascending);
 		}
@@ -99,7 +106,6 @@ public class DefaultWorkerRepository implements WorkerRepository {
 		} catch (DataAccessException e) {
 			return false;
 		}
-
 	}
 
 	@Override
@@ -120,7 +126,7 @@ public class DefaultWorkerRepository implements WorkerRepository {
 			return jdbc.query("SELECT count(*) as count, x, y FROM " + workersTable +
 			                  " GROUP BY x, y", GROUP_ROW_MAPPER);
 		} catch (DataAccessException e) {
-			return Collections.emptyList();
+			return emptyList();
 		}
 	}
 
@@ -128,8 +134,8 @@ public class DefaultWorkerRepository implements WorkerRepository {
 	public boolean update(Worker instance) {
 		String passport = queryPassportOf(instance);
 		Person person = instance.getPerson();
-		var people = buildUpdateFor(person, passport);
-		var workers = buildUpdateForWorker(instance);
+		UpdateCreator people = buildUpdateFor(person, passport);
+		UpdateCreator workers = buildUpdateForWorker(instance);
 		try {
 			return 1 == jdbc.update(people) &&
 			       1 == jdbc.update(workers);
@@ -142,8 +148,7 @@ public class DefaultWorkerRepository implements WorkerRepository {
 		String passport;
 		try {
 			passport = jdbc.queryForObject("SELECT passport FROM " + workersTable +
-			                               " WHERE id = " + instance.getId(),
-			                               String.class);
+			                               " WHERE id = " + instance.getId(), String.class);
 		} catch (DataAccessException e) {
 			throw new IllegalArgumentException("Worker not found for id = " + instance.getId());
 		}
@@ -152,44 +157,44 @@ public class DefaultWorkerRepository implements WorkerRepository {
 
 	private UpdateCreator buildUpdateFor(Person person, String passport) {
 		return new UpdateCreator(peopleTable)
-				.setValue(Column.PASSPORT.getName(), person.getPassport())
-				.setValue(Column.EYE_COLOR.getName(), person.getEyeColor().toString())
-				.setValue(Column.HAIR_COLOR.getName(), person.getHairColor().toString())
-				.setValue(Column.NATIONALITY.getName(), person.getNationality().toString())
-				.whereEquals(Column.PASSPORT.getName(), passport);
+				.setValue(PASSPORT.getName(), person.getPassport())
+				.setValue(EYE_COLOR.getName(), person.getEyeColor().toString())
+				.setValue(HAIR_COLOR.getName(), person.getHairColor().toString())
+				.setValue(NATIONALITY.getName(), person.getNationality().toString())
+				.whereEquals(PASSPORT.getName(), passport);
 	}
 
 	private UpdateCreator buildUpdateForWorker(Worker instance) {
 		return new UpdateCreator(workersTable)
-				.setValue(Column.NAME.getName(), instance.getName())
-				.setValue(Column.X.getName(), instance.getCoordinates().getX())
-				.setValue(Column.Y.getName(), instance.getCoordinates().getY())
-				.setValue(Column.SALARY.getName(), instance.getSalary())
-				.setValue(Column.HIRED.getName(), instance.getHired())
-				.setValue(Column.QUIT.getName(), instance.getQuit())
-				.setValue(Column.STATUS.getName(), instance.getStatus().toString())
-				.whereEquals(Column.ID.getName(), instance.getId());
+				.setValue(NAME.getName(), instance.getName())
+				.setValue(X.getName(), instance.getCoordinates().getX())
+				.setValue(Y.getName(), instance.getCoordinates().getY())
+				.setValue(SALARY.getName(), instance.getSalary())
+				.setValue(HIRED.getName(), instance.getHired())
+				.setValue(QUIT.getName(), instance.getQuit())
+				.setValue(STATUS.getName(), instance.getStatus().toString())
+				.whereEquals(ID.getName(), instance.getId());
 	}
 
 	@Override
 	public Collection<String> findDistinctStatusValues() {
 		String sql = "SELECT DISTINCT status FROM " + workersTable;
 		try {
-			return jdbc.queryForList(sql, null, String.class);
+			return jdbc.queryForList(sql, String.class);
 		} catch (DataAccessException e) {
-			return Collections.emptyList();
+			return emptyList();
 		}
 	}
 
 	@Override
 	public Collection<Worker> findNamedLike(String substring) {
 		String sql = SELECT_SQL +
-		             " WHERE " + Column.NAME.getName() +
+		             " WHERE " + NAME.getName() +
 		             " LIKE '%" + substring + "%'";
 		try {
 			return jdbc.query(sql, WORKER_ROW_MAPPER);
 		} catch (DataAccessException e) {
-			return Collections.emptyList();
+			return emptyList();
 		}
 	}
 
@@ -223,37 +228,4 @@ public class DefaultWorkerRepository implements WorkerRepository {
 		return quote(object.toString());
 	}
 
-	private static class WorkerRowMapper implements RowMapper<Worker> {
-		@Override
-		public Worker mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return Worker.builder()
-			             .id(rs.getInt("id"))
-			             .name(rs.getString("name"))
-			             .coordinates(Coordinates.of(rs.getFloat("x"),
-			                                         rs.getInt("y")))
-			             .created(rs.getTimestamp("created").toLocalDateTime())
-			             .salary(rs.getLong("salary"))
-			             .hired(rs.getTimestamp("hired").toLocalDateTime())
-			             .quit(map(rs.getTimestamp("quit"), Timestamp::toLocalDateTime))
-			             .status(Worker.Status.valueOf(rs.getString("status")))
-			             .person(Person.builder()
-			                           .passport(rs.getString("passport"))
-			                           .eyeColor(Person.EyeColor.valueOf(rs.getString("eye_color")))
-			                           .hairColor(Person.HairColor.valueOf(rs.getString("hair_color")))
-			                           .nationality(Country.valueOf(rs.getString("nationality")))
-			                           .build())
-			             .build();
-		}
-	}
-
-	private static class GroupRowMapper implements RowMapper<Group> {
-		@Override
-		public Group mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return Group.builder()
-			            .x(rs.getInt(Column.X.getName()))
-			            .y(rs.getInt(Column.Y.getName()))
-			            .count(rs.getInt("count"))
-			            .build();
-		}
-	}
 }
