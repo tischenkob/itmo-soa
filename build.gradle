@@ -1,0 +1,24 @@
+plugins {
+    id 'idea'
+}
+
+idea {
+    project {
+        languageLevel = 8
+    }
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+task deploy(type: Exec, dependsOn: [':services:worker:bootWar', ':services:hr:war']) {
+    commandLine "docker-compose",
+            "-f", "env/docker-compose.yml",
+            "up", "--build", "--force-recreate", "--no-deps",
+            "-d", "application"
+}
+
+allprojects {
+    group "ru.ifmo"
+}

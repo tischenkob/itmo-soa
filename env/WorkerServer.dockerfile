@@ -1,5 +1,5 @@
 FROM jboss/wildfly
-ADD ./*.war /opt/jboss/wildfly/standalone/deployments/
+COPY ../services/worker/worker.war /opt/jboss/wildfly/standalone/deployments/
 ARG PROFILE="default"
 ENV JAVA_OPTS="-Dspring.profiles.active=$PROFILE"
 RUN /opt/jboss/wildfly/bin/add-user.sh admin Admin#70365 --silent

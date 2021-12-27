@@ -19,12 +19,12 @@ import static java.util.Objects.requireNonNull;
 @XmlRootElement(name = "person")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Person {
-	private String passport; //не может быть пустой, не null
+	private String passport;
 	@XmlElement(name = "eye-color")
-	private EyeColor eyeColor; //не null
+	private EyeColor eyeColor;
 	@XmlElement(name = "hair-color")
-	private HairColor hairColor; //не null
-	private Country nationality; //не null
+	private HairColor hairColor;
+	private Country nationality;
 
 	public Person(String passport, EyeColor eyeColor, HairColor hairColor, Country nationality) {
 		if (passport == null || passport.trim().isEmpty()) {

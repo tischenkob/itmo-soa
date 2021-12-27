@@ -1,25 +1,14 @@
 plugins {
-    id 'java'
+    id 'java-common'
     id 'war'
     id("org.springframework.boot") version "2.4.4"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
 }
 
-group 'ru.ifmo'
 version '0.2'
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-}
 bootWar {
-    destinationDirectory = file("./env/war")
-    archiveName("worker.war")
-}
-war {
-    destinationDirectory = file("./env/war")
+    destinationDirectory = file("war")
     archiveName("worker.war")
 }
 
@@ -30,24 +19,6 @@ task deploy(type: Exec, dependsOn: bootWar) {
             "-d", "application"
 }
 
-task helios(type: Exec, dependsOn: war) {
-    commandLine "./env/helios.sh"
-}
-
-test {
-    useJUnitPlatform()
-}
-
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
-
-ext {
-    junitVersion = '5.8.2'
-    lombokVersion = '1.18.22'
-}
-
 configurations.implementation {
     exclude module: "spring-boot-starter-logging"
     exclude module: "logback-classic"
@@ -56,10 +27,6 @@ configurations.implementation {
 dependencies {
     // Worker
     implementation(project(":shared"))
-
-    // Lombok
-    annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
-    compileOnly("org.projectlombok:lombok:${lombokVersion}")
 
     //Spring
     implementation("org.springframework.boot:spring-boot-starter-web")

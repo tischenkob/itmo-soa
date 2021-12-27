@@ -1,4 +1,4 @@
-package ru.ifmo.worker.repo.mapper;
+package ru.ifmo.worker.repo.mapping;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;

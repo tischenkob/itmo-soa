@@ -17,5 +17,18 @@ CREATE TABLE IF NOT EXISTS soa_workers
     hired    timestamp   not null,
     quit     timestamp            default null,
     status   varchar(32) not null,
-    passport varchar(32) not null references soa_people ON DELETE CASCADE
+    passport varchar(32) not null references soa_people on delete cascade,
+    org_id   int references soa_orgs on delete cascade
 );
+
+CREATE TABLE IF NOT EXISTS soa_orgs
+(
+    id   serial primary key check (id > 0),
+    name varchar(32) not null check (trim(both from name) <> '')
+);
+
+INSERT INTO soa_orgs(name)
+VALUES ('Facebook'),
+       ('Amazon'),
+       ('Netflix'),
+       ('Google');

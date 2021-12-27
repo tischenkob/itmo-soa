@@ -1,0 +1,26 @@
+version: "3"
+services:
+  db:
+    container_name: worker-db
+    build: ./WorkerDB.dockerfile
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+  worker:
+    container_name: worker-server
+    build: ./WorkerServer.dockerfile
+    ports:
+      - "8080:8080"
+      - "9990:9990"
+    depends_on:
+      - db
+  hr:
+    container_name: hr-server
+    build: ./HRServer.dockerfile
+    ports:
+      - "8084:8080"
+      - "9994:9990"
+    depends_on:
+      - worker

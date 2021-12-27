@@ -8,3 +8,4 @@ database:
   tables:
     people: soa_people
     workers: soa_workers
+    orgs: soa_orgs

@@ -32,6 +32,7 @@ public class DefaultWorkerRepository implements WorkerRepository {
 	private final JdbcTemplate jdbc;
 	private final RowMapper<Worker> WORKER_ROW_MAPPER;
 	private final RowMapper<Group> GROUP_ROW_MAPPER;
+	private final String JOIN_COLUMN = "passport";
 	@Setter
 	@Value("${systemProperties['database.schema']}")
 	private String schema;
@@ -39,7 +40,8 @@ public class DefaultWorkerRepository implements WorkerRepository {
 	private String peopleTable;
 	@Value("${database.tables.workers}")
 	private String workersTable;
-	private final String JOIN_COLUMN = "passport";
+	@Value("${database.tables.orgs}")
+	private String orgsTable;
 	private String SELECT_SQL;
 
 	@PostConstruct
@@ -47,9 +49,11 @@ public class DefaultWorkerRepository implements WorkerRepository {
 		if (schema != null) {
 			peopleTable = schema + "." + peopleTable;
 			workersTable = schema + "." + workersTable;
+			orgsTable = schema + "." + orgsTable;
 		}
-		SELECT_SQL = format("SELECT * FROM %s JOIN %s USING (%s)",
-		                    workersTable, peopleTable, JOIN_COLUMN);
+		SELECT_SQL = "SELECT * FROM " + workersTable + " w " +
+					 "JOIN " + peopleTable + " p USING (" + JOIN_COLUMN + ") " +
+					 "JOIN " + orgsTable + " o ON w.org_id = o.id";
 	}
 
 	@Override
