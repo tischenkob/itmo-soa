@@ -1,0 +1,27 @@
+plugins {
+    id 'java'
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+group 'ru.ifmo'
+version '0.1'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    lombokVersion = '1.18.22'
+}
+
+dependencies {
+    implementation 'javax.ws.rs:javax.ws.rs-api:2.0'
+
+    // Lombok
+    annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+    compileOnly("org.projectlombok:lombok:${lombokVersion}")
+
+    implementation('javax.xml.bind:jaxb-api:2.4.0-b180830.0359')
+}

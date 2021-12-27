@@ -1,1 +1,3 @@
 rootProject.name = "itmo-soa"
+
+include "services:worker", "services:hr", "shared"
