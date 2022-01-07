@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController("/api/extra")
 @RequiredArgsConstructor
-public class ExtraWorkerServlet {
+public class ExtraController {
 	private final WorkerService service;
 
 	@GetMapping("/grouped")

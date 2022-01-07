@@ -12,11 +12,16 @@ idea {
     }
 }
 
-task deploy(type: Exec, dependsOn: [':services:worker:bootWar', ':services:hr:war']) {
+task copyWars(type: Copy, dependsOn: [':services:worker:bootWar', ':services:hr:war']) {
+    from('services/worker/war', 'services/hr/war')
+    include('*.war')
+    into('env/war')
+}
+
+task deploy(type: Exec, dependsOn: copyWars) {
     commandLine "docker-compose",
             "-f", "env/docker-compose.yml",
-            "up", "--build", "--force-recreate", "--no-deps",
-            "-d", "application"
+            "up", "--build", "--force-recreate", "--no-deps"
 }
 
 allprojects {

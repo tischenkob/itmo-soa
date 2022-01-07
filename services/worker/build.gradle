@@ -12,13 +12,6 @@ bootWar {
     archiveName("worker.war")
 }
 
-task deploy(type: Exec, dependsOn: bootWar) {
-    commandLine "docker-compose",
-            "-f", "env/docker-compose.yml",
-            "up", "--build", "--force-recreate", "--no-deps",
-            "-d", "application"
-}
-
 configurations.implementation {
     exclude module: "spring-boot-starter-logging"
     exclude module: "logback-classic"
@@ -36,10 +29,7 @@ dependencies {
     providedRuntime("org.springframework.boot:spring-boot-starter-logging")
 
     // XML
-    implementation('com.sun.xml.bind:jaxb-core:3.0.1')
-    implementation('javax.xml.bind:jaxb-api:2.4.0-b180830.0359')
-    implementation('com.sun.xml.bind:jaxb-impl:3.0.1')
-    implementation('org.javassist:javassist:3.28.0-GA')
+    implementation('com.fasterxml.jackson.dataformat:jackson-dataformat-xml')
 
     // Database
     implementation('commons-dbutils:commons-dbutils:1.7')
