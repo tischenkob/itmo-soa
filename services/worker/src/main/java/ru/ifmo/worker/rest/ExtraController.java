@@ -2,6 +2,7 @@ package ru.ifmo.worker.rest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.ifmo.util.query.Group;
@@ -12,8 +13,9 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 
-@RestController("/api/extra")
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/extra")
 public class ExtraController {
 	private final WorkerService service;
 

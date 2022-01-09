@@ -30,8 +30,8 @@ public class WorkerRowMapper implements RowMapper<Worker> {
                         .hairColor(Person.HairColor.valueOf(rs.getString("hair_color")))
                         .nationality(Country.valueOf(rs.getString("nationality")))
                         .build())
-            .organisation(Organisation.of(rs.getInt("o.id"),
-                                          rs.getString("o.name")))
+            .organisation(Organisation.of(rs.getInt("org_id"),
+                                          rs.getString("org_name")))
             .build();
     }
 }

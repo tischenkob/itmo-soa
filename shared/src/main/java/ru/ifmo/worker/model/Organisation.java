@@ -1,9 +1,13 @@
 package ru.ifmo.worker.model;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Value(staticConstructor = "of")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor(staticName = "of")
 public class Organisation {
-    int id;
-    String name;
+    private int id;
+    private String name;
 }

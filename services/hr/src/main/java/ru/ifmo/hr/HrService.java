@@ -1,45 +1,47 @@
 package ru.ifmo.hr;
 
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Response;
 import lombok.SneakyThrows;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import ru.ifmo.worker.model.Organisation;
 import ru.ifmo.worker.model.Worker;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.servlet.ServletContext;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Scanner;
+import java.util.Properties;
 
-@Path("/api/hr")
+@Path("/api")
 public class HrService {
 
     @Context
     ServletContext context;
 
-    @Resource
     private Workers workers;
 
     @SneakyThrows
     @PostConstruct
     private void initialise() {
-        try (Scanner input = new Scanner(getUrlStream())) {
-            URI apiUri = new URI(input.nextLine());
-            workers = RestClientBuilder.newBuilder()
-                .baseUri(apiUri)
-                .build(Workers.class);
-        }
+        System.out.println("Context: " + context);
+        URI apiUri = new URI(getProperties().getProperty("services.worker.uri"));
+        workers = RestClientBuilder.newBuilder()
+            .baseUri(apiUri)
+            .build(Workers.class);
     }
 
-    private InputStream getUrlStream() {
-        return context.getResourceAsStream("services.worker.uri");
+    private Properties getProperties() throws IOException {
+        try (InputStream stream = context.getResourceAsStream("WEB-INF/service.properties")) {
+            Properties properties = new Properties();
+            properties.load(stream);
+            return properties;
+        }
     }
 
     @GET
@@ -55,7 +57,7 @@ public class HrService {
         if (from != worker.getOrganisation().getId()) {
             throw new IllegalArgumentException("`from id` is different from the actual value");
         }
-        worker.setOrganisation(Organisation.of(to, null));
+        worker.setOrganisation(Organisation.of(to, worker.getOrganisation().getName()));
         workers.update(id, worker);
         return Response.ok().build();
     }

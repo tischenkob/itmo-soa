@@ -1,9 +1,6 @@
 package ru.ifmo.worker.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -13,6 +10,7 @@ import static java.util.Objects.requireNonNull;
 @Setter
 @Builder
 @ToString
+@NoArgsConstructor
 public class Worker {
     private int id;
     private String name;

@@ -34,7 +34,7 @@ public class DefaultWorkerRepository implements WorkerRepository {
 	private final RowMapper<Group> GROUP_ROW_MAPPER;
 	private final String JOIN_COLUMN = "passport";
 	@Setter
-	@Value("${systemProperties['database.schema']}")
+	@Value("#{systemProperties['database.schema']}")
 	private String schema;
 	@Value("${database.tables.people}")
 	private String peopleTable;
@@ -46,19 +46,33 @@ public class DefaultWorkerRepository implements WorkerRepository {
 
 	@PostConstruct
 	void initialize() {
-		if (schema != null) {
+		if (schema != null && !schema.isEmpty()) {
 			peopleTable = schema + "." + peopleTable;
 			workersTable = schema + "." + workersTable;
 			orgsTable = schema + "." + orgsTable;
 		}
-		SELECT_SQL = "SELECT * FROM " + workersTable + " w " +
+		SELECT_SQL = "SELECT w.id AS id,\n" +
+					 "       w.name AS name,\n" +
+					 "       w.x AS x,\n" +
+					 "       w.y AS y,\n" +
+					 "       w.created AS created,\n" +
+					 "       w.salary AS salary,\n" +
+					 "       w.hired AS hired,\n" +
+					 "       w.quit AS quit,\n" +
+					 "       w.status AS status,\n" +
+					 "       p.passport AS passport,\n" +
+					 "       p.eye_color AS eye_color,\n" +
+					 "       p.hair_color AS hair_color,\n" +
+					 "       p.nationality AS nationality,\n" +
+					 "       o.id as org_id,\n" +
+					 "       o.name AS org_name FROM " + workersTable + " w " +
 					 "JOIN " + peopleTable + " p USING (" + JOIN_COLUMN + ") " +
 					 "JOIN " + orgsTable + " o ON w.org_id = o.id";
 	}
 
 	@Override
 	public Optional<Worker> findBy(int id) {
-		List<Worker> workers = jdbc.query(SELECT_SQL + " WHERE id=?", WORKER_ROW_MAPPER, id);
+		List<Worker> workers = jdbc.query(SELECT_SQL + " WHERE w.id=?", WORKER_ROW_MAPPER, id);
 		return workers.isEmpty() ? Optional.empty() : Optional.of(workers.get(0));
 	}
 

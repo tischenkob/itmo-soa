@@ -1,10 +1,12 @@
 package ru.ifmo.worker.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
+@NoArgsConstructor
 public class Coordinates {
 	private float x; //Максимальное 48
 	private int y; //Максимальное 676

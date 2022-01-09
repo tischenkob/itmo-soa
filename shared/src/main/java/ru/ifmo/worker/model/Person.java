@@ -1,9 +1,6 @@
 package ru.ifmo.worker.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import static java.util.Objects.requireNonNull;
 
@@ -11,6 +8,7 @@ import static java.util.Objects.requireNonNull;
 @Setter
 @Builder
 @ToString
+@NoArgsConstructor
 public class Person {
 	private String passport;
 	private EyeColor eyeColor;

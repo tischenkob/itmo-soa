@@ -3,6 +3,7 @@ services:
   db:
     container_name: worker-db
     build:
+      context: .
       dockerfile: ./WorkerDB.dockerfile
     environment:
       POSTGRES_USER: postgres
@@ -12,6 +13,7 @@ services:
   worker:
     container_name: worker-server
     build:
+      context: .
       dockerfile: ./WorkerServer.dockerfile
     ports:
       - "8080:8080"
@@ -21,6 +23,7 @@ services:
   hr:
     container_name: hr-server
     build:
+      context: .
       dockerfile: ./HRServer.dockerfile
     ports:
       - "8084:8080"

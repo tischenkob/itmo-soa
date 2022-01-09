@@ -2,6 +2,7 @@ package ru.ifmo.worker.rest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import ru.ifmo.worker.model.Worker;
 import ru.ifmo.worker.service.WorkerService;
@@ -11,11 +12,14 @@ import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
+import static org.springframework.http.MediaType.APPLICATION_XML;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static ru.ifmo.worker.api.ParameterExtractor.parametersFrom;
 
+@RestController
 @CrossOrigin("*")
 @RequiredArgsConstructor
-@RestController("/api/workers")
+@RequestMapping("/api/workers")
 public class WorkerController {
     private static final Supplier<NoSuchElementException>
         workerNotFound = () -> new NoSuchElementException("Worker not found.");
@@ -27,7 +31,7 @@ public class WorkerController {
         service.save(worker);
     }
 
-    @GetMapping
+    @GetMapping(produces = APPLICATION_XML_VALUE)
     public Collection<Worker> readAll(HttpServletRequest request) {
         return service.findWith(parametersFrom(request));
     }

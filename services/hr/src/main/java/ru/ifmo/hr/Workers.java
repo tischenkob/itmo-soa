@@ -1,7 +1,8 @@
 package ru.ifmo.hr;
 
-import jakarta.ws.rs.*;
 import ru.ifmo.worker.model.Worker;
+
+import javax.ws.rs.*;
 
 @Path("/workers")
 public interface Workers {

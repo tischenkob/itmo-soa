@@ -19,7 +19,7 @@ task copyWars(type: Copy, dependsOn: [':services:worker:bootWar', ':services:hr:
 }
 
 task deploy(type: Exec, dependsOn: copyWars) {
-    commandLine "docker-compose",
+    commandLine "docker", "compose",
             "-f", "env/docker-compose.yml",
             "up", "--build", "--force-recreate", "--no-deps"
 }
