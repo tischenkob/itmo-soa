@@ -1,4 +1,4 @@
-FROM jboss/wildfly
+FROM jboss/wildfly:19.0.0.Final
 COPY war/worker.war /opt/jboss/wildfly/standalone/deployments/
 ARG PROFILE="default"
 ENV JAVA_OPTS="-Dspring.profiles.active=$PROFILE"

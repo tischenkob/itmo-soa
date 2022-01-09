@@ -5,10 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDateTime;
 
 import static java.util.Objects.requireNonNull;
@@ -17,8 +13,6 @@ import static java.util.Objects.requireNonNull;
 @Setter
 @Builder
 @ToString
-@XmlRootElement(name = "worker")
-@XmlAccessorType(XmlAccessType.FIELD)
 public class Worker {
     private int id;
     private String name;
@@ -28,9 +22,7 @@ public class Worker {
     private LocalDateTime hired;
     private LocalDateTime quit;
     private Status status;
-    @XmlElement(name = "person")
     private Person person;
-    @XmlElement(name = "org")
     private Organisation organisation;
 
 

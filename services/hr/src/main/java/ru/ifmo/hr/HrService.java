@@ -1,5 +1,6 @@
 package ru.ifmo.hr;
 
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -39,6 +40,12 @@ public class HrService {
 
     private InputStream getUrlStream() {
         return context.getResourceAsStream("services.worker.uri");
+    }
+
+    @GET
+    @Path("/ping")
+    public Response healthcheck() {
+        return Response.ok("Hello!").build();
     }
 
     @POST

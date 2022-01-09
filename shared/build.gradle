@@ -17,11 +17,9 @@ ext {
 }
 
 dependencies {
-    implementation 'javax.ws.rs:javax.ws.rs-api:2.0'
+    implementation 'javax.ws.rs:javax.ws.rs-api:2.1.1'
 
     // Lombok
     annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
     compileOnly("org.projectlombok:lombok:${lombokVersion}")
-
-    implementation('javax.xml.bind:jaxb-api:2.4.0-b180830.0359')
 }
