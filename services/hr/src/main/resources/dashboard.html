@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>HR Dashboard</title>
+</head>
+<body>
+<h1>Operations</h1>
+<div>
+    <div>
+        <h2>Move</h2>
+        <label> Worker
+            <input type="text">
+        </label>
+        <label> From organisation
+            <input type="text">
+        </label>
+        <label> To organisation
+            <input type="text">
+        </label>
+        <button>Move</button>
+    </div>
+    <div>
+        <h2>Index salary</h2>
+        <label> Worker
+            <input type="text">
+        </label>
+        <label> Percent
+            <input type="text">
+        </label>
+        <button>Index</button>
+    </div>
+</div>
+<div>
+    <h1>Workers</h1>
+    <table>
+        <thead>
+        <tr>
+            <th> ID</th>
+            <th> Name</th>
+            <th> Org ID</th>
+            <th> Org Name</th>
+            <th> Salary</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="worker : ${model}">
+            <td><span th:text="${worker.id}"> ID </span></td>
+            <td><span th:text="${worker.name}"> Name </span></td>
+            <td><span th:text="${worker.organisation.id}"> Org ID </span></td>
+            <td><span th:text="${worker.organisation.name}"> Org Name </span></td>
+            <td><span th:text="${worker.salary}"> Salary </span></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

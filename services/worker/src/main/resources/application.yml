@@ -4,6 +4,7 @@ spring:
     username: postgres
     password: postgres
 
+
 database:
   tables:
     people: soa_people

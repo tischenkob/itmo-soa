@@ -11,13 +11,14 @@ war {
 }
 
 dependencies {
-    // Worker
-    implementation(project(":shared"))
+    implementation project(":shared")
     compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
     compileOnly 'jakarta.annotation:jakarta.annotation-api:1.3.5'
     implementation 'javax.ws.rs:javax.ws.rs-api:2.1.1'
+    implementation 'javax.inject:javax.inject:1'
+
     implementation 'org.apache.httpcomponents:httpclient:4.5.13'
 
     implementation 'org.eclipse.microprofile.rest.client:microprofile-rest-client-api:2.0.1-RC3'
-
+    implementation 'org.thymeleaf:thymeleaf:3.0.12.RELEASE'
 }

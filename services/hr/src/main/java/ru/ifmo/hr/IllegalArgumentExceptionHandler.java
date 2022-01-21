@@ -8,6 +8,6 @@ import javax.ws.rs.ext.Provider;
 public class IllegalArgumentExceptionHandler implements ExceptionMapper<IllegalArgumentException> {
     @Override
     public Response toResponse(IllegalArgumentException ex) {
-        return Response.status(400).build();
+        return Response.status(400).entity(ex.getMessage()).build();
     }
 }
