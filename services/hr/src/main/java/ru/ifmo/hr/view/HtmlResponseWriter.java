@@ -17,8 +17,10 @@ import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import static javax.ws.rs.core.MediaType.TEXT_HTML;
+
 @Provider
-@Produces(MediaType.TEXT_HTML)
+@Produces(TEXT_HTML)
 public class HtmlResponseWriter implements MessageBodyWriter<HtmlResponse> {
 
     private static final TemplateEngine templateEngine;
@@ -30,7 +32,7 @@ public class HtmlResponseWriter implements MessageBodyWriter<HtmlResponse> {
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return HtmlResponse.class.isAssignableFrom(type);
+        return type.isAssignableFrom(HtmlResponse.class);
     }
 
     @Override
@@ -44,10 +46,9 @@ public class HtmlResponseWriter implements MessageBodyWriter<HtmlResponse> {
                         OutputStream entityStream) throws IOException, WebApplicationException {
         Context context = new Context();
         context.setVariable("model", response.getContent());
-
-        Writer writer = new OutputStreamWriter(entityStream);
-        templateEngine.process(response.getTemplateName(), context, writer);
-        writer.flush();
+        try (Writer writer = new OutputStreamWriter(entityStream)) {
+            templateEngine.process(response.getTemplateName(), context, writer);
+        }
     }
 
 }

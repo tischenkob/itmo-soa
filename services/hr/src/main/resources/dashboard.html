@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>HR Dashboard</title>
@@ -10,26 +11,61 @@
     <div>
         <h2>Move</h2>
         <label> Worker
-            <input type="text">
+            <input id="move-id" type="text">
         </label>
         <label> From organisation
-            <input type="text">
+            <input id="move-from" type="text">
         </label>
         <label> To organisation
-            <input type="text">
+            <input id="move-to" type="text">
         </label>
-        <button>Move</button>
+        <button onclick="move()">Move</button>
     </div>
+    <script>
+        function move() {
+            let id = document.getElementById('move-id').value;
+            let from = document.getElementById('move-from').value;
+            let to = document.getElementById('move-to').value;
+
+            fetch(`https://localhost:18443/hr/api/move/${id}/${from}/${to}`, {method: "post"})
+                .then(handleErrors)
+                .then(res => {
+                    window.location.reload(true)
+                })
+                .catch(alert);
+        }
+
+        function handleErrors(result) {
+            if (!result.ok) {
+                throw new Error(result.statusText)
+            }
+            return result
+        }
+    </script>
     <div>
         <h2>Index salary</h2>
         <label> Worker
-            <input type="text">
+            <input id="index-id" type="text">
         </label>
         <label> Percent
-            <input type="text">
+            <input id="index-coeff" type="text">
         </label>
-        <button>Index</button>
+        <button onclick="index()">Index</button>
     </div>
+    <script>
+        function index() {
+            let id = document.getElementById('index-id').value;
+            let coeff = document.getElementById('index-coeff').value;
+
+            fetch(`https://localhost:18443/hr/api/index/${id}/${coeff}`, {method: "post"})
+                .then(handleErrors)
+                .then(res => {
+                    window.location.reload(true)
+                })
+                .catch(alert);
+
+        }
+    </script>
 </div>
 <div>
     <h1>Workers</h1>
