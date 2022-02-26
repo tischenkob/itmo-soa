@@ -9,7 +9,6 @@ import ru.ifmo.worker.service.WorkerService;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.NoSuchElementException;
-import java.util.function.Supplier;
 
 import static ru.ifmo.worker.api.ParameterExtractor.parametersFrom;
 
@@ -18,8 +17,6 @@ import static ru.ifmo.worker.api.ParameterExtractor.parametersFrom;
 @RequiredArgsConstructor
 @RequestMapping("/api/workers")
 public class WorkerController {
-    private static final Supplier<NoSuchElementException>
-        workerNotFound = () -> new NoSuchElementException("Worker not found.");
     private final WorkerService service;
 
     @PostMapping
@@ -35,7 +32,7 @@ public class WorkerController {
 
     @GetMapping("/{id}")
     public Worker read(@PathVariable int id) {
-        return service.findBy(id).orElseThrow(workerNotFound);
+        return service.findBy(id).orElseThrow(WorkerController::workerNotFoundException);
     }
 
     @PutMapping("/{id}")
@@ -49,4 +46,7 @@ public class WorkerController {
         service.deleteBy(id);
     }
 
+    private static NoSuchElementException workerNotFoundException() {
+        return new NoSuchElementException("Worker not found.");
+    }
 }
